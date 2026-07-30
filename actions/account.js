@@ -1,8 +1,10 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
+import { checkUser } from "@/lib/checkUser";
 
 const serializeDecimal = (obj) => {
   const serialized = { ...obj };
@@ -16,12 +18,16 @@ const serializeDecimal = (obj) => {
 };
 
 export async function getAccountWithTransactions(accountId) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
+  let user = await db.user.findUnique({
+    where: { email: session.user.email },
   });
+
+  if (!user) {
+    user = await checkUser();
+  }
 
   if (!user) throw new Error("User not found");
 
@@ -50,16 +56,19 @@ export async function getAccountWithTransactions(accountId) {
 
 export async function bulkDeleteTransactions(transactionIds) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+    let user = await db.user.findUnique({
+      where: { email: session.user.email },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) throw new Error("User not found");
 
-    // Get transactions to calculate balance changes
     const transactions = await db.transaction.findMany({
       where: {
         id: { in: transactionIds },
@@ -67,7 +76,6 @@ export async function bulkDeleteTransactions(transactionIds) {
       },
     });
 
-    // Group transactions by account to update balances
     const accountBalanceChanges = transactions.reduce((acc, transaction) => {
       const change =
         transaction.type === "EXPENSE"
@@ -77,9 +85,7 @@ export async function bulkDeleteTransactions(transactionIds) {
       return acc;
     }, {});
 
-    // Delete transactions and update account balances in a transaction
     await db.$transaction(async (tx) => {
-      // Delete transactions
       await tx.transaction.deleteMany({
         where: {
           id: { in: transactionIds },
@@ -87,7 +93,6 @@ export async function bulkDeleteTransactions(transactionIds) {
         },
       });
 
-      // Update account balances
       for (const [accountId, balanceChange] of Object.entries(
         accountBalanceChanges
       )) {
@@ -113,18 +118,21 @@ export async function bulkDeleteTransactions(transactionIds) {
 
 export async function updateDefaultAccount(accountId) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+    let user = await db.user.findUnique({
+      where: { email: session.user.email },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) {
       throw new Error("User not found");
     }
 
-    // First, unset any existing default account
     await db.account.updateMany({
       where: {
         userId: user.id,
@@ -133,7 +141,6 @@ export async function updateDefaultAccount(accountId) {
       data: { isDefault: false },
     });
 
-    // Then set the new default account
     const account = await db.account.update({
       where: {
         id: accountId,
@@ -143,7 +150,7 @@ export async function updateDefaultAccount(accountId) {
     });
 
     revalidatePath("/dashboard");
-    return { success: true, data: serializeTransaction(account) };
+    return { success: true, data: serializeDecimal(account) };
   } catch (error) {
     return { success: false, error: error.message };
   }

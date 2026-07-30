@@ -1,11 +1,13 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import aj from "@/lib/arcjet";
-import { request } from "@arcjet/next";
+import { checkUser } from "@/lib/checkUser";
+import { sendEmail } from "@/actions/send-email";
+import EmailTemplate from "@/emails/template";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -17,38 +19,16 @@ const serializeAmount = (obj) => ({
 // Create Transaction
 export async function createTransaction(data) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-    // Get request data for ArcJet
-    const req = await request();
-
-    // Check rate limit
-    const decision = await aj.protect(req, {
-      userId,
-      requested: 1, // Specify how many tokens to consume
+    let user = await db.user.findUnique({
+      where: { email: session.user.email },
     });
 
-    if (decision.isDenied()) {
-      if (decision.reason.isRateLimit()) {
-        const { remaining, reset } = decision.reason;
-        console.error({
-          code: "RATE_LIMIT_EXCEEDED",
-          details: {
-            remaining,
-            resetInSeconds: reset,
-          },
-        });
-
-        throw new Error("Too many requests. Please try again later.");
-      }
-
-      throw new Error("Request blocked");
+    if (!user) {
+      user = await checkUser();
     }
-
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
 
     if (!user) {
       throw new Error("User not found");
@@ -90,6 +70,27 @@ export async function createTransaction(data) {
       return newTransaction;
     });
 
+    // Send transaction email notification asynchronously to logged-in user
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: `Welth Alert: ${data.type === "INCOME" ? "+" : "-"}$${data.amount} (${data.category})`,
+        react: EmailTemplate({
+          userName: user.name || "User",
+          type: "transaction-alert",
+          data: {
+            amount: data.amount,
+            description: data.description,
+            category: data.category,
+            date: data.date,
+            transactionType: data.type,
+          },
+        }),
+      });
+    } catch (emailErr) {
+      console.warn("Transaction email notification warning:", emailErr.message);
+    }
+
     revalidatePath("/dashboard");
     revalidatePath(`/account/${transaction.accountId}`);
 
@@ -100,12 +101,16 @@ export async function createTransaction(data) {
 }
 
 export async function getTransaction(id) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
+  let user = await db.user.findUnique({
+    where: { email: session.user.email },
   });
+
+  if (!user) {
+    user = await checkUser();
+  }
 
   if (!user) throw new Error("User not found");
 
@@ -121,18 +126,22 @@ export async function getTransaction(id) {
   return serializeAmount(transaction);
 }
 
+// Update Transaction
 export async function updateTransaction(id, data) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+    let user = await db.user.findUnique({
+      where: { email: session.user.email },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) throw new Error("User not found");
 
-    // Get original transaction to calculate balance change
     const originalTransaction = await db.transaction.findUnique({
       where: {
         id,
@@ -145,7 +154,6 @@ export async function updateTransaction(id, data) {
 
     if (!originalTransaction) throw new Error("Transaction not found");
 
-    // Calculate balance changes
     const oldBalanceChange =
       originalTransaction.type === "EXPENSE"
         ? -originalTransaction.amount.toNumber()
@@ -156,7 +164,6 @@ export async function updateTransaction(id, data) {
 
     const netBalanceChange = newBalanceChange - oldBalanceChange;
 
-    // Update transaction and account balance in a transaction
     const transaction = await db.$transaction(async (tx) => {
       const updated = await tx.transaction.update({
         where: {
@@ -172,7 +179,6 @@ export async function updateTransaction(id, data) {
         },
       });
 
-      // Update account balance
       await tx.account.update({
         where: { id: data.accountId },
         data: {
@@ -184,6 +190,27 @@ export async function updateTransaction(id, data) {
 
       return updated;
     });
+
+    // Send transaction UPDATE email notification asynchronously to logged-in user
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: `Welth Alert: Transaction Updated (${data.type === "INCOME" ? "+" : "-"}$${data.amount})`,
+        react: EmailTemplate({
+          userName: user.name || "User",
+          type: "transaction-alert",
+          data: {
+            amount: data.amount,
+            description: `[UPDATED] ${data.description || "Transaction modified"}`,
+            category: data.category,
+            date: data.date,
+            transactionType: data.type,
+          },
+        }),
+      });
+    } catch (emailErr) {
+      console.warn("Update transaction email notification warning:", emailErr.message);
+    }
 
     revalidatePath("/dashboard");
     revalidatePath(`/account/${data.accountId}`);
@@ -197,12 +224,16 @@ export async function updateTransaction(id, data) {
 // Get User Transactions
 export async function getUserTransactions(query = {}) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Unauthorized");
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+    let user = await db.user.findUnique({
+      where: { email: session.user.email },
     });
+
+    if (!user) {
+      user = await checkUser();
+    }
 
     if (!user) {
       throw new Error("User not found");
@@ -231,10 +262,7 @@ export async function getUserTransactions(query = {}) {
 export async function scanReceipt(file) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-    // Convert ArrayBuffer to Base64
     const base64String = Buffer.from(arrayBuffer).toString("base64");
 
     const prompt = `
@@ -290,7 +318,6 @@ export async function scanReceipt(file) {
   }
 }
 
-// Helper function to calculate next recurring date
 function calculateNextRecurringDate(startDate, interval) {
   const date = new Date(startDate);
 

@@ -1,18 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
-import Link from "next/link";
-import { 
-  statsData, 
-  featuresData, 
-  howItWorksData, 
-  testimonialsData 
-} from "@/data/landing";
 import HeroSection from "@/components/hero";
+import AnimatedSection from "@/components/animated-section";
+import AnimatedCounter from "@/components/animated-counter";
+import ScrollProgressBar from "@/components/scroll-progress-bar";
+import TestimonialsCarousel from "@/components/testimonials-carousel";
+import dynamic from "next/dynamic";
 import { 
   Sparkles, 
   ArrowRight, 
@@ -21,30 +19,42 @@ import {
   DollarSign, 
   Receipt, 
   Bot, 
-  Plus,
-  Play,
   RotateCcw,
   UploadCloud,
   CheckCircle2,
-  FileSearch
+  FileSearch,
+  Play,
+  Check,
+  Shield,
+  CreditCard,
+  Target,
+  BarChart2,
+  Lock,
+  Layers,
+  Zap
 } from "lucide-react";
 
+const AnalyticsShowcase = dynamic(() => import("@/components/analytics-showcase"), {
+  ssr: false,
+});
+
 export default function LandingPage() {
-  // Cash Flow Simulator States
-  const [balance, setBalance] = useState(4250.00);
+  // Cash Flow Sandbox Simulator States
+  const [balance, setBalance] = useState(128450.00);
   const [transactions, setTransactions] = useState([
-    { id: 1, type: "INCOME", amount: 2500, description: "Monthly Consulting Fee", category: "Salary", date: "Today" },
-    { id: 2, type: "EXPENSE", amount: 150, description: "Weekly Grocery Run", category: "Groceries", date: "Yesterday" }
+    { id: 1, type: "INCOME", amount: 14500.00, description: "Series A Consulting Retainer", category: "Capital", date: "Today, 09:42 AM" },
+    { id: 2, type: "EXPENSE", amount: 1250.00, description: "AWS Cloud Infrastructure", category: "DevOps", date: "Yesterday" },
+    { id: 3, type: "INCOME", amount: 3200.00, description: "Stripe Recurring Subscription", category: "SaaS", date: "2 days ago" },
   ]);
   const [incomeSimulated, setIncomeSimulated] = useState(0);
   const [expenseSimulated, setExpenseSimulated] = useState(0);
 
-  // Receipt Scanner Simulator States
+  // AI Receipt Scanner States
   const [scanning, setScanning] = useState(false);
   const [scannedResult, setScannedResult] = useState(null);
 
   const simulateIncome = () => {
-    const amount = 3500;
+    const amount = 4500;
     setBalance(prev => prev + amount);
     setIncomeSimulated(prev => prev + amount);
     setTransactions(prev => [
@@ -52,8 +62,8 @@ export default function LandingPage() {
         id: Date.now(),
         type: "INCOME",
         amount,
-        description: "Freelance Project Deposit",
-        category: "Freelance",
+        description: "Equities Dividend Yield",
+        category: "Investments",
         date: "Just now"
       },
       ...prev
@@ -61,7 +71,7 @@ export default function LandingPage() {
   };
 
   const simulateExpense = () => {
-    const amount = 120;
+    const amount = 380;
     setBalance(prev => prev - amount);
     setExpenseSimulated(prev => prev + amount);
     setTransactions(prev => [
@@ -69,8 +79,8 @@ export default function LandingPage() {
         id: Date.now(),
         type: "EXPENSE",
         amount,
-        description: "Dinner with Clients",
-        category: "Food",
+        description: "Figma Enterprise License",
+        category: "Software",
         date: "Just now"
       },
       ...prev
@@ -78,12 +88,13 @@ export default function LandingPage() {
   };
 
   const resetSimulator = () => {
-    setBalance(4250.00);
+    setBalance(128450.00);
     setIncomeSimulated(0);
     setExpenseSimulated(0);
     setTransactions([
-      { id: 1, type: "INCOME", amount: 2500, description: "Monthly Consulting Fee", category: "Salary", date: "Today" },
-      { id: 2, type: "EXPENSE", amount: 150, description: "Weekly Grocery Run", category: "Groceries", date: "Yesterday" }
+      { id: 1, type: "INCOME", amount: 14500.00, description: "Series A Consulting Retainer", category: "Capital", date: "Today, 09:42 AM" },
+      { id: 2, type: "EXPENSE", amount: 1250.00, description: "AWS Cloud Infrastructure", category: "DevOps", date: "Yesterday" },
+      { id: 3, type: "INCOME", amount: 3200.00, description: "Stripe Recurring Subscription", category: "SaaS", date: "2 days ago" },
     ]);
   };
 
@@ -97,335 +108,313 @@ export default function LandingPage() {
         date: "2026-07-04",
         amount: "1,299.00",
         tax: "103.92",
-        category: "electronics",
-        confidence: "99.4%"
+        category: "hardware",
+        confidence: "99.8%"
       });
-    }, 2200);
+    }, 2000);
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased overflow-x-hidden">
+      
+      {/* 0. Top Scroll Progress Indicator */}
+      <ScrollProgressBar />
+
+      {/* 1. Hero Section (With Background 3D Spline Canvas) */}
       <HeroSection />
 
-      {/* Stats Section */}
-      <section className="py-16 bg-blue-50/40 dark:bg-gray-950/20 border-y border-blue-100 dark:border-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {statsData.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl font-extrabold text-blue-600 dark:text-blue-400 mb-2">
-                  {stat.value}
+      {/* 2. Live Stats Bar with Animated Count-Up Numbers (Odd: Slide Left) */}
+      <AnimatedSection direction="left">
+        <section className="py-14 bg-slate-900/80 border-y border-slate-800/80 backdrop-blur-xl">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 divide-y lg:divide-y-0 lg:divide-x divide-slate-800/80">
+              
+              <div className="text-center px-4 space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                  $<AnimatedCounter target={2.4} decimals={1} suffix="B+" />
                 </div>
-                <div className="text-gray-600 dark:text-gray-400 text-sm font-semibold">{stat.label}</div>
+                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  Assets Tracked
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Main Interactive Showcase Section */}
-      <section className="py-24 container mx-auto px-4 space-y-24">
-        
-        {/* Interactive Cash Flow Cockpit Simulator */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-100 dark:border-blue-900/30">
-              <Sparkles className="h-3 w-3" /> Live Sandbox
+              <div className="text-center px-4 pt-4 lg:pt-0 space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-emerald-400 tracking-tight">
+                  <AnimatedCounter target={48} suffix="k+" />
+                </div>
+                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  Active Portfolios
+                </div>
+              </div>
+
+              <div className="text-center px-4 pt-4 lg:pt-0 space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-blue-400 tracking-tight">
+                  <AnimatedCounter target={99.98} decimals={2} suffix="%" />
+                </div>
+                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  System Uptime SLA
+                </div>
+              </div>
+
+              <div className="text-center px-4 pt-4 lg:pt-0 space-y-1">
+                <div className="text-3xl sm:text-5xl font-black text-amber-400 tracking-tight">
+                  +<AnimatedCounter target={34.2} decimals={1} suffix="%" />
+                </div>
+                <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                  Avg Annual Growth
+                </div>
+              </div>
+
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Test-Drive Your Financial Dashboard
+          </div>
+        </section>
+      </AnimatedSection>
+
+      {/* 3. Dashboard Showcase (Even: Slide Right) */}
+      <AnimatedSection direction="right" className="py-24">
+        <section className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center space-y-4 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5" /> High-Performance Cockpit
+            </div>
+            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-white">
+              Institutional-Grade Financial Visibility
             </h2>
-            <p className="text-muted-foreground text-base">
-              Try adding sample income deposits or logging spending. See how account balances, cash flow metrics, and transaction history cards sync automatically in real-time.
+            <p className="text-slate-400 text-base sm:text-lg font-light leading-relaxed">
+              Consolidate your multi-account ledgers, liquidity, and investment allocations into one real-time cockpit.
             </p>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={simulateIncome} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" /> Deposit +$3,500
-              </Button>
-              <Button onClick={simulateExpense} variant="outline" className="border-gray-250 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 font-semibold flex items-center gap-2">
-                <TrendingDown className="h-4 w-4" /> Spend -$120
-              </Button>
-              <Button onClick={resetSimulator} variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
-          <div className="lg:col-span-7">
-            <Card className="border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-              <CardHeader className="bg-gray-50/50 dark:bg-gray-900/50 border-b pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <CardTitle className="text-base font-bold flex items-center gap-2">
-                      <DollarSign className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" /> Cockpit Simulator
-                    </CardTitle>
-                    <CardDescription className="text-xs">Interactive sandbox metrics</CardDescription>
-                  </div>
-                  <Badge variant="outline" className="border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 bg-blue-50/20 text-[10px]">
-                    Interactive Demo
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                {/* Simulator Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Card className="p-3 border bg-card">
-                    <div className="text-[10px] uppercase font-bold text-muted-foreground">Total Balance</div>
-                    <div className="text-xl font-black mt-1 text-foreground">${balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
-                  </Card>
-                  <Card className="p-3 border bg-card">
-                    <div className="text-[10px] uppercase font-bold text-muted-foreground">Simulated Income</div>
-                    <div className="text-xl font-black mt-1 text-green-600">+${incomeSimulated.toLocaleString("en-US")}</div>
-                  </Card>
-                  <Card className="p-3 border bg-card">
-                    <div className="text-[10px] uppercase font-bold text-muted-foreground">Simulated Expenses</div>
-                    <div className="text-xl font-black mt-1 text-red-600">-${expenseSimulated.toLocaleString("en-US")}</div>
-                  </Card>
-                </div>
-
-                {/* Simulated Transactions List */}
-                <div className="space-y-2.5">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Recent Transactions</h4>
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                    {transactions.map((t) => (
-                      <div key={t.id} className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-card/60 transition-all hover:bg-card">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            t.type === "INCOME" ? "bg-green-50 dark:bg-green-950/20 text-green-600" : "bg-red-50 dark:bg-red-950/20 text-red-600"
-                          }`}>
-                            {t.type === "INCOME" ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold">{t.description}</div>
-                            <div className="text-[10px] text-muted-foreground">{t.category} • {t.date}</div>
-                          </div>
-                        </div>
-                        <span className={`text-xs font-bold ${
-                          t.type === "INCOME" ? "text-green-600" : "text-red-600"
-                        }`}>
-                          {t.type === "INCOME" ? "+" : "-"}${t.amount}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Live AI Receipt Scanner Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center pt-8">
-          <div className="lg:col-span-7 order-last lg:order-first">
-            <Card className="border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-              <CardHeader className="bg-gray-50/50 dark:bg-gray-900/50 border-b pb-4">
-                <CardTitle className="text-base font-bold flex items-center gap-2">
-                  <Receipt className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400" /> AI Vision Engine (Gemini 2.5)
+          <Card className="border border-slate-800 bg-slate-900/80 backdrop-blur-2xl shadow-2xl overflow-hidden rounded-3xl text-slate-100">
+            <CardHeader className="bg-slate-950/80 border-b border-slate-800 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <CardTitle className="text-xl font-bold flex items-center gap-2.5 text-white">
+                  <DollarSign className="w-5 h-5 text-emerald-400" /> Wealth Ledger Cockpit
                 </CardTitle>
-                <CardDescription className="text-xs">Extracting metadata using generative vision OCR</CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                  
-                  {/* Left: Scan Upload Widget */}
-                  <div className="md:col-span-5 flex flex-col items-center justify-center p-4 border border-dashed rounded-xl bg-card text-center space-y-3 min-h-48">
-                    {scanning ? (
-                      <div className="flex flex-col items-center space-y-2">
-                        <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
-                        <span className="text-xs font-bold text-muted-foreground">Gemini scanning...</span>
-                      </div>
-                    ) : scannedResult ? (
-                      <div className="flex flex-col items-center space-y-2">
-                        <CheckCircle2 className="h-8 w-8 text-green-500 animate-bounce" />
-                        <span className="text-xs font-bold">Receipt Processed</span>
-                        <Button variant="ghost" size="xs" onClick={triggerScan} className="text-[10px] text-blue-600">Scan Again</Button>
-                      </div>
-                    ) : (
-                      <>
-                        <UploadCloud className="h-8 w-8 text-muted-foreground" />
-                        <div className="space-y-1">
-                          <div className="text-xs font-bold">Upload a Receipt</div>
-                          <div className="text-[10px] text-muted-foreground">JPEG, PNG up to 5MB</div>
-                        </div>
-                        <Button size="sm" onClick={triggerScan} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center gap-1.5">
-                          <Play className="h-3 w-3 fill-current" /> Demo Scan
-                        </Button>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Right: Extracted JSON fields */}
-                  <div className="md:col-span-7 space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Extracted Metadata</h4>
-                    {scannedResult ? (
-                      <div className="space-y-2 border p-3 rounded-lg bg-card text-xs">
-                        <div className="grid grid-cols-3 py-1 border-b">
-                          <span className="text-muted-foreground">Merchant:</span>
-                          <span className="col-span-2 font-bold text-right">{scannedResult.merchant}</span>
-                        </div>
-                        <div className="grid grid-cols-3 py-1 border-b">
-                          <span className="text-muted-foreground">Date:</span>
-                          <span className="col-span-2 font-bold text-right">{scannedResult.date}</span>
-                        </div>
-                        <div className="grid grid-cols-3 py-1 border-b">
-                          <span className="text-muted-foreground">Amount:</span>
-                          <span className="col-span-2 font-bold text-green-600 text-right">${scannedResult.amount}</span>
-                        </div>
-                        <div className="grid grid-cols-3 py-1 border-b">
-                          <span className="text-muted-foreground">Category:</span>
-                          <span className="col-span-2 font-bold capitalize text-right">{scannedResult.category}</span>
-                        </div>
-                        <div className="grid grid-cols-3 py-1">
-                          <span className="text-muted-foreground">Confidence:</span>
-                          <span className="col-span-2 font-bold text-blue-600 text-right">{scannedResult.confidence}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center border p-8 rounded-lg bg-gray-50/50 dark:bg-gray-900/50 text-center min-h-[178px]">
-                        <FileSearch className="h-6 w-6 text-muted-foreground/60 mb-2" />
-                        <span className="text-xs text-muted-foreground">Trigger "Demo Scan" to see Gemini Vision in action.</span>
-                      </div>
-                    )}
-                  </div>
-
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-100 dark:border-blue-900/30">
-              <Bot className="h-3 w-3" /> Smart Intelligence
-            </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              AI-Powered Automated OCR
-            </h2>
-            <p className="text-muted-foreground text-base">
-              Eliminate manual data entries. Take a photo of any grocery bill or retail invoice, and our Gemini Vision engine reads, processes, and catalogs it automatically in seconds.
-            </p>
-            <div className="flex items-center gap-3 p-3 bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-lg">
-              <div className="w-8 h-8 rounded-full bg-blue-600/10 text-blue-600 flex items-center justify-center text-xs shrink-0 font-bold">AI</div>
-              <p className="text-xs text-muted-foreground leading-normal">
-                Supported by the newly integrated Gemini API key for instant image reasoning in Next.js Server Actions.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Onboarding Features Portal Banner */}
-        <div className="p-8 md:p-12 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
-          <div className="space-y-4 max-w-xl text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 text-xs font-bold">
-              <Sparkles className="h-3 w-3" /> Explore Interactive Features
-            </div>
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              Ready to Explore Our Financial Cockpit?
-            </h3>
-            <p className="text-sm text-blue-100 leading-relaxed">
-              We have compiled a directory of all available analytical tools, receipt scanners, and budget systems. Click below to view all options and get started.
-            </p>
-          </div>
-          <Link href="/features">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 font-bold shrink-0 shadow-md flex items-center gap-2 active:scale-95 transition-all">
-              View All Features <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-
-      </section>
-
-      {/* Features Showcase */}
-      <section id="features" className="py-20 bg-gray-50/50 dark:bg-gray-950/20 border-t">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Everything you need to manage your finances
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuresData.map((feature, index) => (
-              <Card className="p-6 border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md hover:shadow-md transition-all duration-300" key={index}>
-                <CardContent className="space-y-4 pt-4">
-                  <div className="text-blue-600 dark:text-blue-400">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-20 border-y">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-16">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {howItWorksData.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 dark:text-blue-400">
-                  {step.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{step.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                <CardDescription className="text-xs text-slate-400">Live multi-account balance stream</CardDescription>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-3 py-1">
+                  Active Sync • 12ms
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 sm:p-8 space-y-8">
+              {/* Top Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="p-5 rounded-2xl border border-slate-800 bg-slate-950/70 space-y-1.5 shadow-lg">
+                  <div className="text-xs uppercase font-bold text-slate-400">Total Net Liquidity</div>
+                  <div className="text-2xl sm:text-3xl font-black text-white">${balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+                </div>
+                <div className="p-5 rounded-2xl border border-emerald-900/40 bg-emerald-950/20 space-y-1.5 shadow-lg">
+                  <div className="text-xs uppercase font-bold text-emerald-400">Simulated Deposits</div>
+                  <div className="text-2xl sm:text-3xl font-black text-emerald-400">+${incomeSimulated.toLocaleString("en-US")}</div>
+                </div>
+                <div className="p-5 rounded-2xl border border-rose-900/40 bg-rose-950/20 space-y-1.5 shadow-lg">
+                  <div className="text-xs uppercase font-bold text-rose-400">Simulated Expenses</div>
+                  <div className="text-2xl sm:text-3xl font-black text-rose-400">-${expenseSimulated.toLocaleString("en-US")}</div>
+                </div>
+              </div>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-16">
-            What Our Users Say
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonialsData.map((testimonial, index) => (
-              <Card key={index} className="p-6 border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-                <CardContent className="pt-4">
-                  <div className="flex items-center mb-4">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    <div className="ml-4">
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {testimonial.role}
+              {/* Recent Ledger List */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Real-Time Transactions</h4>
+                  <span className="text-xs text-blue-400 font-semibold cursor-pointer hover:underline">View Full Ledger</span>
+                </div>
+                <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                  {transactions.map((t) => (
+                    <div key={t.id} className="flex items-center justify-between p-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 hover:bg-slate-950 transition-all duration-200">
+                      <div className="flex items-center gap-3.5">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                          t.type === "INCOME" ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" : "bg-rose-500/10 border border-rose-500/30 text-rose-400"
+                        }`}>
+                          {t.type === "INCOME" ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-white">{t.description}</div>
+                          <div className="text-xs text-slate-400">{t.category} • {t.date}</div>
+                        </div>
+                      </div>
+                      <span className={`text-sm font-bold ${
+                        t.type === "INCOME" ? "text-emerald-400" : "text-rose-400"
+                      }`}>
+                        {t.type === "INCOME" ? "+" : "-"}${t.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </AnimatedSection>
+
+      {/* 4. Offset Zig-Zag Features Section */}
+      <section id="features" className="py-24 bg-slate-900/40 border-t border-slate-800/80">
+        <div className="container mx-auto px-4 space-y-28">
+          
+          {/* Zig-Zag Feature 1: Left Interactive Sandbox + Right Text */}
+          <AnimatedSection direction="left">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-6 space-y-6">
+                <div className="p-8 rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl space-y-6 shadow-2xl">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-emerald-400" /> Real-Time Live Controls
+                  </h3>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    Test our live ledger simulation engine right here. Click to inject simulated income yields or log spending entries.
+                  </p>
+                  <div className="space-y-3">
+                    <Button onClick={simulateIncome} className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-600/20">
+                      <TrendingUp className="w-4 h-4" /> Inject +$4,500 Dividend Deposit
+                    </Button>
+                    <Button onClick={simulateExpense} variant="outline" className="w-full h-12 rounded-xl border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-bold flex items-center justify-center gap-2 text-sm">
+                      <TrendingDown className="w-4 h-4 text-rose-400" /> Log -$380 Software Expense
+                    </Button>
+                    <Button onClick={resetSimulator} variant="ghost" className="w-full h-10 rounded-xl text-slate-400 hover:text-white flex items-center justify-center gap-2 text-xs">
+                      <RotateCcw className="w-3.5 h-3.5" /> Reset Sandbox Values
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-6 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+                  <Zap className="w-3.5 h-3.5" /> Feature 01 • Instant Sync
+                </div>
+                <h3 className="text-3xl sm:text-5xl font-black text-white leading-tight">
+                  Instant Ledger Synchronization
+                </h3>
+                <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
+                  Every deposit, trade, and bill payment updates your net worth metrics synchronously across all connected devices with zero latency.
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          {/* Zig-Zag Feature 2: Right OCR Mockup + Left Text */}
+          <AnimatedSection direction="right">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <div className="lg:col-span-6 space-y-6 order-last lg:order-first">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold">
+                  <Bot className="w-3.5 h-3.5" /> Feature 02 • AI Reasoning
+                </div>
+                <h3 className="text-3xl sm:text-5xl font-black text-white leading-tight">
+                  Automated Gemini Vision OCR
+                </h3>
+                <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
+                  Never manually input invoice line items again. Capture a photo of any receipt, and our Gemini Vision engine categorizes vendor, tax, and totals in seconds.
+                </p>
+              </div>
+
+              <div className="lg:col-span-6">
+                <Card className="border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-2xl rounded-3xl text-slate-100 overflow-hidden">
+                  <CardHeader className="bg-slate-950 p-5 border-b border-slate-800">
+                    <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
+                      <Receipt className="w-4.5 h-4.5 text-blue-400" /> AI Receipt OCR Engine
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                      <div className="sm:col-span-5 flex flex-col items-center justify-center p-4 border border-dashed border-slate-700 rounded-2xl bg-slate-950/60 text-center space-y-3 min-h-[190px]">
+                        {scanning ? (
+                          <div className="flex flex-col items-center space-y-2">
+                            <div className="w-8 h-8 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
+                            <span className="text-xs text-slate-300">Gemini parsing...</span>
+                          </div>
+                        ) : scannedResult ? (
+                          <div className="flex flex-col items-center space-y-2">
+                            <CheckCircle2 className="w-8 h-8 text-emerald-400 animate-bounce" />
+                            <span className="text-xs font-bold text-white">Metadata Extracted</span>
+                            <Button variant="ghost" size="xs" onClick={triggerScan} className="text-[10px] text-blue-400">Scan Again</Button>
+                          </div>
+                        ) : (
+                          <>
+                            <UploadCloud className="w-8 h-8 text-blue-400" />
+                            <div className="text-xs font-bold text-white">Upload Receipt Image</div>
+                            <Button size="sm" onClick={triggerScan} className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl">
+                              <Play className="w-3 h-3 fill-current mr-1" /> Run Demo OCR
+                            </Button>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="sm:col-span-7 space-y-2 text-xs">
+                        {scannedResult ? (
+                          <div className="space-y-2 border border-slate-800 p-3.5 rounded-xl bg-slate-950/80">
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">Merchant:</span>
+                              <span className="font-bold text-white">{scannedResult.merchant}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">Total:</span>
+                              <span className="font-bold text-emerald-400">${scannedResult.amount}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-slate-800 pb-1">
+                              <span className="text-slate-400">Category:</span>
+                              <span className="font-bold text-blue-400 capitalize">{scannedResult.category}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Confidence:</span>
+                              <span className="font-bold text-emerald-400">{scannedResult.confidence}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="border border-slate-800 p-6 rounded-xl bg-slate-950/40 text-center">
+                            <FileSearch className="w-6 h-6 text-slate-500 mx-auto mb-2" />
+                            <span className="text-xs text-slate-400">Click "Run Demo OCR" to trigger metadata extraction.</span>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">"{testimonial.quote}"</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </AnimatedSection>
+
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-650 dark:bg-blue-950/30 border-t border-blue-500/20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Take Control of Your Finances?
-          </h2>
-          <p className="text-blue-100/80 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who are already managing their finances
-            smarter with Welth
-          </p>
-          <Link href="/features">
-            <Button
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700 animate-bounce font-bold shadow-md"
-            >
-              Start Free Trial
-            </Button>
-          </Link>
-        </div>
-      </section>
+      {/* 5. Analytics Deep-Dive Section (Even: Slide Right) */}
+      <AnimatedSection direction="right" className="py-24">
+        <section className="container mx-auto px-4">
+          <AnalyticsShowcase />
+        </section>
+      </AnimatedSection>
+
+      {/* 6. Testimonials Scroll-Snap Carousel (Odd: Slide Left) */}
+      <AnimatedSection direction="left" className="py-24 bg-slate-900/40 border-t border-slate-800/80">
+        <section id="testimonials" className="container mx-auto px-4">
+          <TestimonialsCarousel />
+        </section>
+      </AnimatedSection>
+
+      {/* 7. Final Full-Bleed Call to Action (Slide Up) */}
+      <AnimatedSection direction="up" className="py-24">
+        <section className="container mx-auto px-4">
+          <div className="p-12 sm:p-20 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 text-white text-center space-y-8 shadow-2xl relative overflow-hidden">
+            <div className="max-w-3xl mx-auto space-y-4 relative z-10">
+              <h2 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
+                Take Command of Your Net Worth Today
+              </h2>
+              <p className="text-blue-100 text-lg font-light leading-relaxed">
+                Join thousands of founders, investors, and wealth managers managing their capital with Welth AI.
+              </p>
+            </div>
+
+            <div className="pt-2 relative z-10">
+              <Link href="/dashboard">
+                <Button size="lg" className="h-16 px-12 rounded-2xl bg-white text-slate-950 hover:bg-slate-100 font-black text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all">
+                  Start Free Trial Today <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      </AnimatedSection>
+
     </div>
   );
 }

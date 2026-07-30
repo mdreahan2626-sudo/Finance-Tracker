@@ -1,22 +1,18 @@
+"use client";
+
 import React from "react";
 import { Button } from "./ui/button";
 import { 
   PenBox, 
   LayoutDashboard, 
-  Settings, 
-  Menu, 
-  ChevronDown, 
-  Receipt, 
-  PieChart, 
-  CreditCard, 
-  Cpu, 
-  Sparkles 
+  LogOut,
+  UserPlus,
+  LogIn
 } from "lucide-react";
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { checkUser } from "@/lib/checkUser";
 import Image from "next/image";
-import ThemeToggle from "@/components/theme-toggle";
+import { useSession, signOut } from "next-auth/react";
+import AuthModal from "@/components/auth-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,11 +22,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const Header = async () => {
-  await checkUser();
+export default function Header() {
+  const { data: session } = useSession();
 
   return (
-    <header className="fixed top-0 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-md z-50 border-b border-gray-200 dark:border-gray-800">
+    <header className="fixed top-0 w-full bg-slate-950/80 backdrop-blur-md z-50 border-b border-slate-800">
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center gap-2">
@@ -44,140 +40,120 @@ const Header = async () => {
           </div>
         </Link>
 
-        {/* Navigation Links - Different for signed in/out users */}
+        {/* Navigation Links */}
         <div className="hidden md:flex items-center space-x-8">
-          <SignedOut>
-            <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-              Features
-            </a>
-            <a
-              href="#testimonials"
-              className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-            >
-              Testimonials
-            </a>
-          </SignedOut>
+          <a href="#features" className="text-slate-300 hover:text-blue-400 font-medium text-sm transition-colors">
+            Features
+          </a>
+          <a href="#testimonials" className="text-slate-300 hover:text-blue-400 font-medium text-sm transition-colors">
+            Testimonials
+          </a>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
+        {/* Action Buttons & Profile */}
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          {session ? (
+            <>
+              {/* Dashboard Button */}
+              <Link href="/dashboard">
+                <Button variant="outline" className="flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-200 hover:bg-slate-800">
+                  <LayoutDashboard className="w-4 h-4 text-blue-400" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Button>
+              </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-gray-200 dark:border-gray-800 flex items-center gap-1.5 px-3">
-                <Menu size={18} />
-                <span className="font-semibold text-sm">Main Menu</span>
-                <ChevronDown size={14} className="opacity-60" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64" align="end">
-              <DropdownMenuLabel>Wealth Options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <Link href="/features">
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <Sparkles size={16} className="text-blue-600 dark:text-blue-400" />
-                  <div className="flex flex-col">
-                    <span className="font-bold text-xs">Features Hub</span>
-                    <span className="text-[10px] text-muted-foreground">View all tools directory</span>
-                  </div>
-                </DropdownMenuItem>
+              {/* Add Transaction Button */}
+              <Link href="/transaction/create">
+                <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20">
+                  <PenBox className="w-4 h-4" />
+                  <span className="hidden sm:inline">Add Transaction</span>
+                </Button>
               </Link>
-              <DropdownMenuSeparator />
-              <Link href="/features/dashboard">
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <LayoutDashboard size={16} className="text-blue-600 dark:text-blue-400" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-xs">Financial Cockpit</span>
-                    <span className="text-[10px] text-muted-foreground">Aggregated balances & logs</span>
-                  </div>
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/features/transaction">
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <Receipt size={16} className="text-emerald-600 dark:text-emerald-400" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-xs">Log Transaction</span>
-                    <span className="text-[10px] text-muted-foreground">Track income & expenses</span>
-                  </div>
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/features/budget">
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <PieChart size={16} className="text-amber-600 dark:text-amber-400" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-xs">Spending Limits</span>
-                    <span className="text-[10px] text-muted-foreground">Monthly threshold alerts</span>
-                  </div>
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/features/accounts">
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <CreditCard size={16} className="text-purple-600 dark:text-purple-400" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-xs">Account Ledgers</span>
-                    <span className="text-[10px] text-muted-foreground">Manage cash & cards</span>
-                  </div>
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/features/inngest">
-                <DropdownMenuItem className="cursor-pointer gap-2 py-2">
-                  <Cpu size={16} className="text-cyan-600 dark:text-cyan-400" />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-xs">Automations</span>
-                    <span className="text-[10px] text-muted-foreground">Background chron checker</span>
-                  </div>
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
 
-          <SignedIn>
-            <Link
-              href="/dashboard"
-              className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2"
-            >
-              <Button variant="outline" className="border-gray-200 dark:border-gray-800">
-                <LayoutDashboard size={18} />
-                <span className="hidden md:inline">Dashboard</span>
-              </Button>
-            </Link>
-            
-            <Link
-              href="/settings"
-              className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2"
-            >
-              <Button variant="outline" className="border-gray-200 dark:border-gray-800">
-                <Settings size={18} />
-                <span className="hidden md:inline">Settings</span>
-              </Button>
-            </Link>
+              {/* User Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-slate-700 p-0 overflow-hidden shrink-0">
+                    {session.user?.image ? (
+                      <Image
+                        src={session.user.image}
+                        alt={session.user.name || "User Avatar"}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">
+                        {session.user?.name?.[0] || "U"}
+                      </div>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-slate-900 border-slate-800 text-slate-200" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-bold leading-none text-white">{session.user?.name}</p>
+                      <p className="text-xs leading-none text-slate-400">{session.user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-slate-800" />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="cursor-pointer flex items-center gap-2">
+                      <LayoutDashboard className="w-4 h-4 text-blue-400" /> Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/transaction/create" className="cursor-pointer flex items-center gap-2">
+                      <PenBox className="w-4 h-4 text-emerald-400" /> Log Transaction
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-800" />
+                  <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="cursor-pointer text-rose-400 focus:text-rose-300 flex items-center gap-2">
+                    <LogOut className="w-4 h-4" /> Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              {/* Signed-Out State: Dashboard & Add Transaction Trigger AuthModal */}
+              <AuthModal defaultTab="login">
+                <Button variant="outline" className="flex items-center gap-2 border-slate-700 bg-slate-900/80 text-slate-200 hover:bg-slate-800">
+                  <LayoutDashboard className="w-4 h-4 text-blue-400" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Button>
+              </AuthModal>
 
-            <a href="/transaction/create">
-              <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700">
-                <PenBox size={18} />
-                <span className="hidden md:inline">Add Transaction</span>
-              </Button>
-            </a>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton forceRedirectUrl="/dashboard">
-              <Button variant="outline" className="border-gray-200 dark:border-gray-800">Login</Button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10",
-                },
-              }}
-            />
-          </SignedIn>
+              <AuthModal defaultTab="login">
+                <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20">
+                  <PenBox className="w-4 h-4" />
+                  <span className="hidden sm:inline">Add Transaction</span>
+                </Button>
+              </AuthModal>
+
+              {/* Login Button with Modal */}
+              <AuthModal defaultTab="login">
+                <Button
+                  variant="ghost"
+                  className="text-slate-300 hover:text-white hover:bg-slate-800 font-semibold rounded-xl px-3 flex items-center gap-1.5 text-xs sm:text-sm"
+                >
+                  <LogIn className="w-4 h-4 text-blue-400" />
+                  <span>Log In</span>
+                </Button>
+              </AuthModal>
+
+              {/* Create New Account Button with Modal */}
+              <AuthModal defaultTab="register">
+                <Button
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl px-3 sm:px-4 text-xs sm:text-sm shadow-lg shadow-blue-600/25 flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Create Account</span>
+                </Button>
+              </AuthModal>
+            </>
+          )}
         </div>
       </nav>
     </header>
   );
-};
-
-export default Header;
+}

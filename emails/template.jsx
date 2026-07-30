@@ -9,42 +9,6 @@ import {
   Text,
 } from "@react-email/components";
 
-// Dummy data for preview
-const PREVIEW_DATA = {
-  monthlyReport: {
-    userName: "John Doe",
-    type: "monthly-report",
-    data: {
-      month: "December",
-      stats: {
-        totalIncome: 5000,
-        totalExpenses: 3500,
-        byCategory: {
-          housing: 1500,
-          groceries: 600,
-          transportation: 400,
-          entertainment: 300,
-          utilities: 700,
-        },
-      },
-      insights: [
-        "Your housing expenses are 43% of your total spending - consider reviewing your housing costs.",
-        "Great job keeping entertainment expenses under control this month!",
-        "Setting up automatic savings could help you save 20% more of your income.",
-      ],
-    },
-  },
-  budgetAlert: {
-    userName: "John Doe",
-    type: "budget-alert",
-    data: {
-      percentageUsed: 85,
-      budgetAmount: 4000,
-      totalExpenses: 3400,
-    },
-  },
-};
-
 export default function EmailTemplate({
   userName = "",
   type = "monthly-report",
@@ -59,6 +23,44 @@ export default function EmailTemplate({
   const budgetExpenses = Number(data?.totalExpenses || 0);
   const percentageUsed = Number(data?.percentageUsed || 0);
 
+  if (type === "transaction-alert") {
+    const { amount, description, category, date, transactionType } = data;
+    return (
+      <Html>
+        <Head />
+        <Preview>Transaction Confirmation - {formatCurrency(amount)}</Preview>
+        <Body style={styles.body}>
+          <Container style={styles.container}>
+            <Heading style={styles.title}>Transaction Alert 💳</Heading>
+            <Text style={styles.text}>Hello {userName || "User"},</Text>
+            <Text style={styles.text}>
+              A new transaction has been logged on your Welth account:
+            </Text>
+            <Section style={styles.statsContainer}>
+              <div style={styles.stat}>
+                <Text style={styles.text}>Type</Text>
+                <Text style={{ ...styles.heading, color: transactionType === "INCOME" ? "#10b981" : "#ef4444" }}>
+                  {transactionType || "EXPENSE"}
+                </Text>
+              </div>
+              <div style={styles.stat}>
+                <Text style={styles.text}>Amount</Text>
+                <Text style={styles.heading}>{formatCurrency(amount)}</Text>
+              </div>
+              <div style={styles.stat}>
+                <Text style={styles.text}>Category & Details</Text>
+                <Text style={styles.heading}>{category} • {description || "Direct Transaction"}</Text>
+              </div>
+            </Section>
+            <Text style={styles.footer}>
+              Thank you for tracking your finances with Welth!
+            </Text>
+          </Container>
+        </Body>
+      </Html>
+    );
+  }
+
   if (type === "monthly-report") {
     return (
       <Html>
@@ -66,7 +68,7 @@ export default function EmailTemplate({
         <Preview>Your Monthly Financial Report</Preview>
         <Body style={styles.body}>
           <Container style={styles.container}>
-            <Heading style={styles.title}>Monthly Financial Report</Heading>
+            <Heading style={styles.title}>Monthly Financial Report 📊</Heading>
 
             <Text style={styles.text}>Hello {userName},</Text>
             <Text style={styles.text}>
@@ -84,7 +86,7 @@ export default function EmailTemplate({
                 <Text style={styles.heading}>{formatCurrency(totalExpenses)}</Text>
               </div>
               <div style={styles.stat}>
-                <Text style={styles.text}>Net</Text>
+                <Text style={styles.text}>Net Savings</Text>
                 <Text style={styles.heading}>
                   {formatCurrency(totalIncome - totalExpenses)}
                 </Text>
@@ -109,7 +111,7 @@ export default function EmailTemplate({
             {/* AI Insights */}
             {insights.length > 0 && (
               <Section style={styles.section}>
-                <Heading style={styles.heading}>Welth Tips</Heading>
+                <Heading style={styles.heading}>Welth AI Insights</Heading>
                 {insights.map((insight, index) => (
                   <Text key={index} style={styles.text}>
                     • {insight}
@@ -119,8 +121,7 @@ export default function EmailTemplate({
             )}
 
             <Text style={styles.footer}>
-              Thank you for using Welth. Keep tracking your finances for better
-              financial health!
+              Thank you for using Welth. Keep tracking your finances for better financial health!
             </Text>
           </Container>
         </Body>
@@ -135,11 +136,10 @@ export default function EmailTemplate({
         <Preview>Budget Alert</Preview>
         <Body style={styles.body}>
           <Container style={styles.container}>
-            <Heading style={styles.title}>Budget Alert</Heading>
+            <Heading style={styles.title}>Budget Alert ⚠️</Heading>
             <Text style={styles.text}>Hello {userName},</Text>
             <Text style={styles.text}>
-              You&rsquo;ve used {percentageUsed.toFixed(1)}% of your
-              monthly budget.
+              You&rsquo;ve used {percentageUsed.toFixed(1)}% of your monthly budget limit.
             </Text>
             <Section style={styles.statsContainer}>
               <div style={styles.stat}>
@@ -174,7 +174,7 @@ export default function EmailTemplate({
             <Heading style={styles.title}>Security Verification</Heading>
             <Text style={styles.text}>Hello {userName || "User"},</Text>
             <Text style={styles.text}>
-              We received a request to verify your identity. Please use the following One-Time Passcode (OTP) to complete the verification process:
+              We received a request to verify your identity. Please use the following One-Time Passcode (OTP):
             </Text>
             
             <Section style={{ margin: "24px 0", textAlign: "center" }}>
@@ -193,44 +193,6 @@ export default function EmailTemplate({
                 {otp}
               </div>
             </Section>
-
-            <Text style={{ ...styles.text, fontSize: "14px", color: "#6b7280" }}>
-              This code will expire in 10 minutes. If you did not request this verification, please ignore this email or secure your account.
-            </Text>
-          </Container>
-        </Body>
-      </Html>
-    );
-  }
-
-  if (type === "welcome-alert") {
-    return (
-      <Html>
-        <Head />
-        <Preview>Welcome to Welth!</Preview>
-        <Body style={styles.body}>
-          <Container style={styles.container}>
-            <Heading style={styles.title}>Welcome to Welth 🚀</Heading>
-            <Text style={styles.text}>Hello {userName || "there"},</Text>
-            <Text style={styles.text}>
-              Thank you for signing up for Welth! We are excited to help you take control of your financial journey.
-            </Text>
-            
-            <Section style={styles.section}>
-              <Heading style={{ ...styles.heading, fontSize: "18px" }}>Here is what you can do with Welth:</Heading>
-              <Text style={styles.text}>• 📊 <strong>Track Finances</strong>: Monitor accounts and transactions in one central dashboard.</Text>
-              <Text style={styles.text}>• 🎯 <strong>Set Budgets</strong>: Control your expenses by setting monthly limits and getting notified when you reach 80% usage.</Text>
-              <Text style={styles.text}>• 🧠 <strong>AI Receipt Scanner</strong>: Automatically extract transaction details from receipt images using Gemini AI.</Text>
-              <Text style={styles.text}>• 🔄 <strong>Automate Recurring Bills</strong>: Let Inngest handle your monthly, weekly, or daily repeating transactions.</Text>
-            </Section>
-
-            <Text style={styles.text}>
-              We have initialized your account and everything is ready to go.
-            </Text>
-
-            <Text style={styles.footer}>
-              Welcome aboard! If you have any questions, feel free to contact our support team.
-            </Text>
           </Container>
         </Body>
       </Html>

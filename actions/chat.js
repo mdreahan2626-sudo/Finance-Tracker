@@ -1,17 +1,18 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { checkUser } from "@/lib/checkUser";
 
 export async function askFinancialCoach(messages) {
   try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) throw new Error("Unauthorized");
 
     let user = await db.user.findUnique({
-      where: { clerkUserId: userId },
+      where: { email: session.user.email },
     });
 
     if (!user) {

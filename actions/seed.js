@@ -2,13 +2,15 @@
 
 import { db } from "@/lib/prisma";
 import { subDays } from "date-fns";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { checkUser } from "@/lib/checkUser";
+import { sendEmail } from "@/actions/send-email";
+import EmailTemplate from "@/emails/template";
 
 const ACCOUNT_ID = "0a2aaae8-7555-4612-8f62-36a367185ee3";
 const USER_ID = "4d1c9814-4402-40fb-8b3b-e10c45c3b0dc";
 
-// Categories with their typical amount ranges
 const CATEGORIES = {
   INCOME: [
     { name: "salary", range: [5000, 8000] },
@@ -30,12 +32,10 @@ const CATEGORIES = {
   ],
 };
 
-// Helper to generate random amount within a range
 function getRandomAmount(min, max) {
   return Number((Math.random() * (max - min) + min).toFixed(2));
 }
 
-// Helper to get random category with amount
 function getRandomCategory(type) {
   const categories = CATEGORIES[type];
   const category = categories[Math.floor(Math.random() * categories.length)];
@@ -45,19 +45,23 @@ function getRandomCategory(type) {
 
 export async function seedTransactions() {
   try {
-    const { userId } = await auth();
+    const session = await getServerSession(authOptions);
     let activeUserId = USER_ID;
     let activeAccountId = ACCOUNT_ID;
+    let recipientEmail = process.env.RESEND_EMAIL_TO || "mdrehan98178@gmail.com";
+    let recipientName = "User";
 
-    if (userId) {
+    if (session && session.user?.email) {
       let dbUser = await db.user.findUnique({
-        where: { clerkUserId: userId },
+        where: { email: session.user.email },
       });
       if (!dbUser) {
         dbUser = await checkUser();
       }
       if (dbUser) {
         activeUserId = dbUser.id;
+        recipientEmail = dbUser.email;
+        recipientName = dbUser.name || "User";
         
         let account = await db.account.findFirst({
           where: { userId: dbUser.id },
@@ -82,7 +86,6 @@ export async function seedTransactions() {
         update: {},
         create: {
           id: USER_ID,
-          clerkUserId: "seed_clerk_user",
           email: "seed_user@example.com",
           name: "Seed User",
         },
@@ -102,18 +105,17 @@ export async function seedTransactions() {
       });
     }
 
-    // Generate 90 days of transactions
     const transactions = [];
     let totalBalance = 0;
+    let totalIncome = 0;
+    let totalExpenses = 0;
+    let categoryExpenses = {};
 
     for (let i = 90; i >= 0; i--) {
       const date = subDays(new Date(), i);
-
-      // Generate 1-3 transactions per day
       const transactionsPerDay = Math.floor(Math.random() * 3) + 1;
 
       for (let j = 0; j < transactionsPerDay; j++) {
-        // 40% chance of income, 60% chance of expense
         const type = Math.random() < 0.4 ? "INCOME" : "EXPENSE";
         const { category, amount } = getRandomCategory(type);
 
@@ -133,33 +135,94 @@ export async function seedTransactions() {
           updatedAt: date,
         };
 
-        totalBalance += type === "INCOME" ? amount : -amount;
+        if (type === "INCOME") {
+          totalIncome += amount;
+          totalBalance += amount;
+        } else {
+          totalExpenses += amount;
+          totalBalance -= amount;
+          categoryExpenses[category] = (categoryExpenses[category] || 0) + amount;
+        }
+
         transactions.push(transaction);
       }
     }
 
-    // Insert transactions in batches and update account balance
     await db.$transaction(async (tx) => {
-      // Clear existing transactions
       await tx.transaction.deleteMany({
         where: { accountId: activeAccountId },
       });
 
-      // Insert new transactions
       await tx.transaction.createMany({
         data: transactions,
       });
 
-      // Update account balance
       await tx.account.update({
         where: { id: activeAccountId },
         data: { balance: totalBalance },
       });
     });
 
+    // 1. Send Test Transaction Alert Email
+    let transactionEmailSent = false;
+    try {
+      await sendEmail({
+        to: recipientEmail,
+        subject: `[Seed Test] Welth Transaction Alert: -$${transactions[0]?.amount} (${transactions[0]?.category})`,
+        react: EmailTemplate({
+          userName: recipientName,
+          type: "transaction-alert",
+          data: {
+            amount: transactions[0]?.amount || 250,
+            description: transactions[0]?.description || "Paid for groceries",
+            category: transactions[0]?.category || "groceries",
+            date: new Date(),
+            transactionType: transactions[0]?.type || "EXPENSE",
+          },
+        }),
+      });
+      transactionEmailSent = true;
+    } catch (e) {
+      console.error("Failed to send seed transaction email:", e.message);
+    }
+
+    // 2. Send Test Monthly Expense Summary Report Email
+    let summaryEmailSent = false;
+    try {
+      await sendEmail({
+        to: recipientEmail,
+        subject: `[Seed Test] Your Monthly Expense Summary Report`,
+        react: EmailTemplate({
+          userName: recipientName,
+          type: "monthly-report",
+          data: {
+            month: "July 2026",
+            stats: {
+              totalIncome: Math.round(totalIncome),
+              totalExpenses: Math.round(totalExpenses),
+              byCategory: categoryExpenses,
+            },
+            insights: [
+              `Housing and travel were your highest expense categories this cycle.`,
+              `Your net balance stands at $${totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })} across your accounts.`,
+              `Automated AI receipt scanning is active on your profile.`
+            ],
+          },
+        }),
+      });
+      summaryEmailSent = true;
+    } catch (e) {
+      console.error("Failed to send seed summary report email:", e.message);
+    }
+
     return {
       success: true,
-      message: `Created ${transactions.length} transactions`,
+      message: `Created ${transactions.length} transactions in Prisma database!`,
+      emails: {
+        recipient: recipientEmail,
+        transactionEmailSent,
+        summaryEmailSent,
+      }
     };
   } catch (error) {
     console.error("Error seeding transactions:", error);

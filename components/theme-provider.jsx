@@ -3,38 +3,21 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext({
-  theme: "light",
+  theme: "dark",
   setTheme: () => null,
 });
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState("light");
-  const [mounted, setMounted] = useState(false);
+  const [theme] = useState("dark");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    setMounted(true);
+    // Force dark mode on document element permanently
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
   }, []);
 
-  const toggleTheme = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
-
-  // Prevent flash during hydration by showing children only after mount
   return (
-    <ThemeContext.Provider value={{ theme, setTheme: toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme: () => null }}>
       {children}
     </ThemeContext.Provider>
   );
