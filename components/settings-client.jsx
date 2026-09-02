@@ -23,6 +23,8 @@ import {
   FileText,
   CheckCircle2,
   Loader2,
+  Sparkles,
+  Lock
 } from "lucide-react";
 
 export default function SettingsClient({ userEmail, userName }) {
@@ -116,65 +118,71 @@ export default function SettingsClient({ userEmail, userName }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight gradient-title mb-2">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your application theme, security OTP alerts, and test background email queues.
-        </p>
-      </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 md:px-8 relative overflow-hidden">
+      {/* Soft Ambient Light Glows */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 left-10 w-80 h-80 bg-blue-100/40 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Theme Card */}
-        <Card className="border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Sun className="h-5 w-5 text-yellow-500 dark:hidden" />
-              <Moon className="h-5 w-5 text-blue-400 hidden dark:block" />
-              <CardTitle>Appearance</CardTitle>
-            </div>
-            <CardDescription>
-              Toggle between Light and Dark themes to customize your viewing experience.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-between">
-            <div className="flex flex-col gap-1">
-              <span className="font-medium text-sm">Dark Mode</span>
-              <span className="text-xs text-muted-foreground">
-                Apply dark styling to elements and layouts.
-              </span>
-            </div>
-            <Switch
-              checked={theme === "dark"}
-              onCheckedChange={handleToggleTheme}
-              className="data-[state=checked]:bg-blue-600"
-            />
-          </CardContent>
-        </Card>
+      <div className="max-w-4xl mx-auto space-y-8 relative z-10">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold shadow-xs">
+            <Sparkles className="w-3.5 h-3.5" /> System Controls
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-950">Settings & Security</h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-normal">
+            Manage your interface appearance, two-factor OTP security, and trigger automated Inngest test queues.
+          </p>
+        </div>
 
-        {/* Test Alert Emails Card */}
-        <Card className="border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-blue-500" />
-              <CardTitle>Alert Notification Queues</CardTitle>
-            </div>
-            <CardDescription>
-              Trigger mock notification emails processed asynchronously by Inngest background jobs.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col gap-2">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Theme Card */}
+          <Card className="border border-slate-200 bg-white/95 backdrop-blur-xl shadow-xs rounded-3xl">
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Sun className="h-5 w-5 text-amber-500" />
+                <CardTitle className="text-base font-black text-slate-950">Interface Appearance</CardTitle>
+              </div>
+              <CardDescription className="text-xs text-slate-500">
+                Toggle between Light and Dark themes to customize your viewing experience.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between pt-2">
+              <div className="flex flex-col gap-0.5">
+                <span className="font-bold text-sm text-slate-900">Dark Mode</span>
+                <span className="text-xs text-slate-500">
+                  Switch to dark palette across cards and charts.
+                </span>
+              </div>
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={handleToggleTheme}
+                className="data-[state=checked]:bg-emerald-600"
+              />
+            </CardContent>
+          </Card>
+
+          {/* Test Alert Emails Card */}
+          <Card className="border border-slate-200 bg-white/95 backdrop-blur-xl shadow-xs rounded-3xl">
+            <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-emerald-600" />
+                <CardTitle className="text-base font-black text-slate-950">Automated Email Queues</CardTitle>
+              </div>
+              <CardDescription className="text-xs text-slate-500">
+                Trigger mock notification emails processed asynchronously by Inngest background runners.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-2">
               <Button
                 variant="outline"
                 onClick={handleSendBudgetAlert}
                 disabled={loadingBudgetAlert}
-                className="w-full flex items-center justify-center gap-2 border-gray-200 dark:border-gray-800"
+                className="w-full h-10 rounded-xl flex items-center justify-center gap-2 border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold"
               >
                 {loadingBudgetAlert ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Bell className="h-4 w-4" />
+                  <Bell className="h-4 w-4 text-amber-600" />
                 )}
                 Trigger Test Budget Alert
               </Button>
@@ -182,103 +190,82 @@ export default function SettingsClient({ userEmail, userName }) {
                 variant="outline"
                 onClick={handleSendMonthlyReport}
                 disabled={loadingMonthlyReport}
-                className="w-full flex items-center justify-center gap-2 border-gray-200 dark:border-gray-800"
+                className="w-full h-10 rounded-xl flex items-center justify-center gap-2 border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold"
               >
                 {loadingMonthlyReport ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <FileText className="h-4 w-4" />
+                  <FileText className="h-4 w-4 text-emerald-600" />
                 )}
-                Trigger Test Monthly Report
+                Trigger Test Monthly Digest
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* OTP Security Verification Card */}
+        <Card className="border border-slate-200 bg-white/95 backdrop-blur-xl shadow-xs rounded-3xl">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <CardTitle className="text-base font-black text-slate-950">2FA OTP Identity Security</CardTitle>
+            </div>
+            <CardDescription className="text-xs text-slate-500">
+              Verify your email identity with cryptographic one-time password security tokens dispatched via Inngest and Resend.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                type="email"
+                placeholder="Enter email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-11 bg-slate-50 border-slate-300 rounded-xl text-sm"
+              />
+              <Button
+                onClick={handleSendOtp}
+                disabled={loadingOtp}
+                className="h-11 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xs shrink-0"
+              >
+                {loadingOtp ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send 6-Digit OTP"}
               </Button>
             </div>
+
+            {otpSent && (
+              <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-3">
+                <div className="flex justify-between items-center text-xs text-emerald-800 font-bold">
+                  <span>Enter the code sent to {email}:</span>
+                  {generatedOtp && (
+                    <span className="font-mono text-[10px] text-emerald-600">Dev Mock: {generatedOtp}</span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter code"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="h-10 bg-white border-emerald-300 rounded-xl font-mono tracking-widest text-center text-base"
+                    maxLength={6}
+                  />
+                  <Button
+                    onClick={handleVerifyOtp}
+                    disabled={loadingVerification}
+                    className="h-10 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
+                  >
+                    {loadingVerification ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify Code"}
+                  </Button>
+                </div>
+                {verified && (
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 pt-1">
+                    <CheckCircle2 className="w-4 h-4" /> Identity Verified Successfully!
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
-
-      {/* OTP Panel Card */}
-      <Card className="border border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-green-500" />
-            <CardTitle>Identity OTP Verification Alert</CardTitle>
-          </div>
-          <CardDescription>
-            Simulate sending a secure verification code to verify email configuration using Resend + Inngest events.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-1 w-full space-y-2">
-              <label className="text-sm font-medium">Verify Email</label>
-              <div className="relative">
-                <Input
-                  type="email"
-                  placeholder="your-email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 border-gray-200 dark:border-gray-800"
-                />
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
-            <Button
-              onClick={handleSendOtp}
-              disabled={loadingOtp}
-              className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 w-full md:w-auto"
-            >
-              {loadingOtp ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                "Send OTP Code"
-              )}
-            </Button>
-          </div>
-
-          {otpSent && (
-            <div className="border border-blue-100 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/10 p-6 rounded-lg space-y-4">
-              <div className="space-y-2">
-                <span className="font-medium text-sm block">Enter 6-Digit Passcode</span>
-                <p className="text-xs text-muted-foreground">
-                  A verification email was sent to <strong>{email}</strong>. Check your inbox and enter the passcode below.
-                </p>
-                <div className="flex flex-col md:flex-row gap-4 items-center mt-2">
-                  <Input
-                    type="text"
-                    maxLength={6}
-                    placeholder="Enter 6-digit OTP"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                    className="w-full md:w-48 text-center text-lg font-semibold tracking-widest border-gray-200 dark:border-gray-800"
-                    disabled={verified}
-                  />
-                  {!verified ? (
-                    <Button
-                      onClick={handleVerifyOtp}
-                      disabled={loadingVerification || verificationCode.length !== 6}
-                      className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-600 dark:hover:bg-green-700 w-full md:w-auto"
-                    >
-                      {loadingVerification ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Verify Code"
-                      )}
-                    </Button>
-                  ) : (
-                    <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
-                      <CheckCircle2 className="h-5 w-5" />
-                      Verified!
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
