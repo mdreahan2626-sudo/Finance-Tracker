@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import HeroSection from "@/components/hero";
+import MarketTicker from "@/components/market-ticker";
+import WealthSimulator3D from "@/components/wealth-simulator-3d";
+import BentoGridFinance from "@/components/bento-grid-finance";
 import AnimatedSection from "@/components/animated-section";
 import AnimatedCounter from "@/components/animated-counter";
 import ScrollProgressBar from "@/components/scroll-progress-bar";
@@ -17,21 +20,9 @@ import {
   TrendingUp, 
   TrendingDown, 
   DollarSign, 
-  Receipt, 
-  Bot, 
   RotateCcw,
-  UploadCloud,
-  CheckCircle2,
-  FileSearch,
-  Play,
-  Check,
-  Shield,
-  CreditCard,
-  Target,
-  BarChart2,
-  Lock,
-  Layers,
-  Zap
+  Zap,
+  ArrowUpRight
 } from "lucide-react";
 
 const AnalyticsShowcase = dynamic(() => import("@/components/analytics-showcase"), {
@@ -48,10 +39,6 @@ export default function LandingPage() {
   ]);
   const [incomeSimulated, setIncomeSimulated] = useState(0);
   const [expenseSimulated, setExpenseSimulated] = useState(0);
-
-  // AI Receipt Scanner States
-  const [scanning, setScanning] = useState(false);
-  const [scannedResult, setScannedResult] = useState(null);
 
   const simulateIncome = () => {
     const amount = 4500;
@@ -98,34 +85,21 @@ export default function LandingPage() {
     ]);
   };
 
-  const triggerScan = () => {
-    setScanning(true);
-    setScannedResult(null);
-    setTimeout(() => {
-      setScanning(false);
-      setScannedResult({
-        merchant: "Apple Store Infinite Loop",
-        date: "2026-07-04",
-        amount: "1,299.00",
-        tax: "103.92",
-        category: "hardware",
-        confidence: "99.8%"
-      });
-    }, 2000);
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased overflow-x-hidden">
       
       {/* 0. Top Scroll Progress Indicator */}
       <ScrollProgressBar />
 
-      {/* 1. Hero Section (With Background 3D Spline Canvas) */}
+      {/* 1. Real-Time Global Market Ticker Bar */}
+      <MarketTicker />
+
+      {/* 2. Hero Section (With 3D Titanium Card, Floating Glass Badges & Currency Mesh Canvas) */}
       <HeroSection />
 
-      {/* 2. Live Stats Bar with Animated Count-Up Numbers (Odd: Slide Left) */}
-      <AnimatedSection direction="left">
-        <section className="py-14 bg-slate-900/80 border-y border-slate-800/80 backdrop-blur-xl">
+      {/* 3. Live Stats Bar with Animated Count-Up Numbers */}
+      <AnimatedSection direction="up">
+        <section className="py-14 bg-slate-900/90 border-y border-slate-800/80 backdrop-blur-xl">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 divide-y lg:divide-y-0 lg:divide-x divide-slate-800/80">
               
@@ -170,17 +144,35 @@ export default function LandingPage() {
         </section>
       </AnimatedSection>
 
-      {/* 3. Dashboard Showcase (Even: Slide Right) */}
-      <AnimatedSection direction="right" className="py-24">
+      {/* 4. Interactive 3D Wealth Compounding Simulator */}
+      <section id="simulator" className="py-24 relative">
+        <div className="container mx-auto px-4">
+          <AnimatedSection direction="up">
+            <WealthSimulator3D />
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* 5. Institutional Bento Grid (Laser OCR Sweep + Asset Allocation + Budget Sentinel) */}
+      <section id="features" className="py-24 bg-slate-900/40 border-t border-slate-800/80">
+        <div className="container mx-auto px-4">
+          <AnimatedSection direction="up">
+            <BentoGridFinance />
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* 6. Dashboard Showcase & Live Sandbox Simulator */}
+      <AnimatedSection direction="up" className="py-24 border-t border-slate-800/80">
         <section className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center space-y-4 mb-16">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" /> High-Performance Cockpit
             </div>
-            <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-white">
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
               Institutional-Grade Financial Visibility
             </h2>
-            <p className="text-slate-400 text-base sm:text-lg font-light leading-relaxed">
+            <p className="text-slate-400 text-sm sm:text-base font-light leading-relaxed">
               Consolidate your multi-account ledgers, liquidity, and investment allocations into one real-time cockpit.
             </p>
           </div>
@@ -216,11 +208,29 @@ export default function LandingPage() {
                 </div>
               </div>
 
+              {/* Interactive Simulation Action Buttons */}
+              <div className="p-6 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Interactive Cash Flow Injector</span>
+                  <Button onClick={resetSimulator} variant="ghost" size="xs" className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5">
+                    <RotateCcw className="w-3.5 h-3.5" /> Reset Demo
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button onClick={simulateIncome} className="h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 text-xs shadow-lg shadow-emerald-600/20">
+                    <TrendingUp className="w-4 h-4" /> Inject +$4,500 Dividend Deposit
+                  </Button>
+                  <Button onClick={simulateExpense} variant="outline" className="h-11 rounded-xl border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold flex items-center justify-center gap-2 text-xs">
+                    <TrendingDown className="w-4 h-4 text-rose-400" /> Log -$380 Software Expense
+                  </Button>
+                </div>
+              </div>
+
               {/* Recent Ledger List */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Real-Time Transactions</h4>
-                  <span className="text-xs text-blue-400 font-semibold cursor-pointer hover:underline">View Full Ledger</span>
+                  <span className="text-xs text-emerald-400 font-semibold cursor-pointer hover:underline">View Full Ledger</span>
                 </div>
                 <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                   {transactions.map((t) => (
@@ -250,156 +260,29 @@ export default function LandingPage() {
         </section>
       </AnimatedSection>
 
-      {/* 4. Offset Zig-Zag Features Section */}
-      <section id="features" className="py-24 bg-slate-900/40 border-t border-slate-800/80">
-        <div className="container mx-auto px-4 space-y-28">
-          
-          {/* Zig-Zag Feature 1: Left Interactive Sandbox + Right Text */}
-          <AnimatedSection direction="left">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              <div className="lg:col-span-6 space-y-6">
-                <div className="p-8 rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl space-y-6 shadow-2xl">
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-emerald-400" /> Real-Time Live Controls
-                  </h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">
-                    Test our live ledger simulation engine right here. Click to inject simulated income yields or log spending entries.
-                  </p>
-                  <div className="space-y-3">
-                    <Button onClick={simulateIncome} className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-600/20">
-                      <TrendingUp className="w-4 h-4" /> Inject +$4,500 Dividend Deposit
-                    </Button>
-                    <Button onClick={simulateExpense} variant="outline" className="w-full h-12 rounded-xl border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200 font-bold flex items-center justify-center gap-2 text-sm">
-                      <TrendingDown className="w-4 h-4 text-rose-400" /> Log -$380 Software Expense
-                    </Button>
-                    <Button onClick={resetSimulator} variant="ghost" className="w-full h-10 rounded-xl text-slate-400 hover:text-white flex items-center justify-center gap-2 text-xs">
-                      <RotateCcw className="w-3.5 h-3.5" /> Reset Sandbox Values
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="lg:col-span-6 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                  <Zap className="w-3.5 h-3.5" /> Feature 01 • Instant Sync
-                </div>
-                <h3 className="text-3xl sm:text-5xl font-black text-white leading-tight">
-                  Instant Ledger Synchronization
-                </h3>
-                <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
-                  Every deposit, trade, and bill payment updates your net worth metrics synchronously across all connected devices with zero latency.
-                </p>
-              </div>
-            </div>
-          </AnimatedSection>
-
-          {/* Zig-Zag Feature 2: Right OCR Mockup + Left Text */}
-          <AnimatedSection direction="right">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              <div className="lg:col-span-6 space-y-6 order-last lg:order-first">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold">
-                  <Bot className="w-3.5 h-3.5" /> Feature 02 • AI Reasoning
-                </div>
-                <h3 className="text-3xl sm:text-5xl font-black text-white leading-tight">
-                  Automated Gemini Vision OCR
-                </h3>
-                <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
-                  Never manually input invoice line items again. Capture a photo of any receipt, and our Gemini Vision engine categorizes vendor, tax, and totals in seconds.
-                </p>
-              </div>
-
-              <div className="lg:col-span-6">
-                <Card className="border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-2xl rounded-3xl text-slate-100 overflow-hidden">
-                  <CardHeader className="bg-slate-950 p-5 border-b border-slate-800">
-                    <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
-                      <Receipt className="w-4.5 h-4.5 text-blue-400" /> AI Receipt OCR Engine
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
-                      <div className="sm:col-span-5 flex flex-col items-center justify-center p-4 border border-dashed border-slate-700 rounded-2xl bg-slate-950/60 text-center space-y-3 min-h-[190px]">
-                        {scanning ? (
-                          <div className="flex flex-col items-center space-y-2">
-                            <div className="w-8 h-8 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
-                            <span className="text-xs text-slate-300">Gemini parsing...</span>
-                          </div>
-                        ) : scannedResult ? (
-                          <div className="flex flex-col items-center space-y-2">
-                            <CheckCircle2 className="w-8 h-8 text-emerald-400 animate-bounce" />
-                            <span className="text-xs font-bold text-white">Metadata Extracted</span>
-                            <Button variant="ghost" size="xs" onClick={triggerScan} className="text-[10px] text-blue-400">Scan Again</Button>
-                          </div>
-                        ) : (
-                          <>
-                            <UploadCloud className="w-8 h-8 text-blue-400" />
-                            <div className="text-xs font-bold text-white">Upload Receipt Image</div>
-                            <Button size="sm" onClick={triggerScan} className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl">
-                              <Play className="w-3 h-3 fill-current mr-1" /> Run Demo OCR
-                            </Button>
-                          </>
-                        )}
-                      </div>
-
-                      <div className="sm:col-span-7 space-y-2 text-xs">
-                        {scannedResult ? (
-                          <div className="space-y-2 border border-slate-800 p-3.5 rounded-xl bg-slate-950/80">
-                            <div className="flex justify-between border-b border-slate-800 pb-1">
-                              <span className="text-slate-400">Merchant:</span>
-                              <span className="font-bold text-white">{scannedResult.merchant}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-800 pb-1">
-                              <span className="text-slate-400">Total:</span>
-                              <span className="font-bold text-emerald-400">${scannedResult.amount}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-800 pb-1">
-                              <span className="text-slate-400">Category:</span>
-                              <span className="font-bold text-blue-400 capitalize">{scannedResult.category}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Confidence:</span>
-                              <span className="font-bold text-emerald-400">{scannedResult.confidence}</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="border border-slate-800 p-6 rounded-xl bg-slate-950/40 text-center">
-                            <FileSearch className="w-6 h-6 text-slate-500 mx-auto mb-2" />
-                            <span className="text-xs text-slate-400">Click "Run Demo OCR" to trigger metadata extraction.</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </AnimatedSection>
-
-        </div>
-      </section>
-
-      {/* 5. Analytics Deep-Dive Section (Even: Slide Right) */}
-      <AnimatedSection direction="right" className="py-24">
+      {/* 7. Analytics Deep-Dive Section */}
+      <AnimatedSection direction="up" className="py-24 bg-slate-900/40 border-t border-slate-800/80">
         <section className="container mx-auto px-4">
           <AnalyticsShowcase />
         </section>
       </AnimatedSection>
 
-      {/* 6. Testimonials Scroll-Snap Carousel (Odd: Slide Left) */}
-      <AnimatedSection direction="left" className="py-24 bg-slate-900/40 border-t border-slate-800/80">
+      {/* 8. Testimonials Scroll-Snap Carousel */}
+      <AnimatedSection direction="up" className="py-24 border-t border-slate-800/80">
         <section id="testimonials" className="container mx-auto px-4">
           <TestimonialsCarousel />
         </section>
       </AnimatedSection>
 
-      {/* 7. Final Full-Bleed Call to Action (Slide Up) */}
+      {/* 9. Final Full-Bleed Call to Action */}
       <AnimatedSection direction="up" className="py-24">
         <section className="container mx-auto px-4">
-          <div className="p-12 sm:p-20 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 text-white text-center space-y-8 shadow-2xl relative overflow-hidden">
+          <div className="p-12 sm:p-20 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 text-white text-center space-y-8 shadow-2xl relative overflow-hidden">
             <div className="max-w-3xl mx-auto space-y-4 relative z-10">
               <h2 className="text-4xl sm:text-6xl font-black tracking-tight leading-tight">
-                Take Command of Your Net Worth Today
+                Take Command of Your Wealth Today
               </h2>
-              <p className="text-blue-100 text-lg font-light leading-relaxed">
+              <p className="text-emerald-50 text-base sm:text-lg font-light leading-relaxed">
                 Join thousands of founders, investors, and wealth managers managing their capital with Welth AI.
               </p>
             </div>
