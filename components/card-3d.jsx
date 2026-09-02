@@ -26,14 +26,14 @@ export default function Card3D({ balance = 128450.00 }) {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -16;
-    const rotateY = ((x - centerX) / centerX) * 16;
+    const rotateX = ((y - centerY) / centerY) * -15;
+    const rotateY = ((x - centerX) / centerX) * 15;
 
     setRotate({ x: rotateX, y: rotateY });
     setGlare({
       x: (x / rect.width) * 100,
       y: (y / rect.height) * 100,
-      opacity: 0.35,
+      opacity: 0.4,
     });
   };
 
@@ -65,41 +65,38 @@ export default function Card3D({ balance = 128450.00 }) {
             }deg) scale3d(1.02, 1.02, 1.02)`,
           }}
         >
-          {/* ================= FRONT OF CARD ================= */}
-          <div className="absolute inset-0 w-full h-full rounded-3xl p-6 sm:p-7 backface-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black border border-slate-700/80 shadow-2xl shadow-emerald-500/10 flex flex-col justify-between overflow-hidden">
+          {/* ================= FRONT OF CARD (Platinum / Light Frosted Luxury) ================= */}
+          <div className="absolute inset-0 w-full h-full rounded-3xl p-6 sm:p-7 backface-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-slate-200 shadow-2xl shadow-emerald-500/10 flex flex-col justify-between overflow-hidden">
             {/* Dynamic Holographic Foil Glare */}
             <div
               className="absolute inset-0 pointer-events-none transition-opacity duration-300 rounded-3xl mix-blend-color-dodge"
               style={{
-                background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(52, 211, 153, 0.45) 0%, rgba(59, 130, 246, 0.25) 35%, transparent 70%)`,
+                background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(52, 211, 153, 0.45) 0%, rgba(59, 130, 246, 0.25) 40%, transparent 70%)`,
                 opacity: glare.opacity,
               }}
             />
 
-            {/* Subtle Metallic Brushed Texture Grid */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-40" />
-
-            {/* Ambient Gold/Emerald Accents */}
-            <div className="absolute -top-12 -right-12 w-40 h-40 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+            {/* Ambient Platinum Sheen */}
+            <div className="absolute -top-12 -right-12 w-44 h-44 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-teal-400/15 rounded-full blur-3xl pointer-events-none" />
 
             {/* Card Header: Brand & Contactless */}
             <div className="relative z-10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                  <span className="font-black text-slate-950 text-base">W</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center shadow-md shadow-emerald-500/30">
+                  <span className="font-black text-white text-base">W</span>
                 </div>
                 <div>
-                  <span className="font-black text-base sm:text-lg tracking-wider bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                    WELTH BLACK
+                  <span className="font-black text-base sm:text-lg tracking-wider bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 bg-clip-text text-transparent">
+                    WELTH PLATINUM
                   </span>
-                  <div className="text-[9px] uppercase tracking-widest text-emerald-400 font-bold">
+                  <div className="text-[9px] uppercase tracking-widest text-emerald-600 font-black">
                     Institutional Tier
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
-                <Wifi className="w-5 h-5 rotate-90 text-slate-300" />
+                <Wifi className="w-5 h-5 rotate-90 text-slate-600" />
               </div>
             </div>
 
@@ -113,31 +110,31 @@ export default function Card3D({ balance = 128450.00 }) {
 
               {/* Dynamic Balance */}
               <div className="text-right">
-                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500">
                   Available Portfolio Liquidity
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-end gap-1">
-                  <span className="text-emerald-400">{currency.symbol}</span>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center justify-end gap-1">
+                  <span className="text-emerald-600 font-bold">{currency.symbol}</span>
                   <span>{displayBalance}</span>
                 </div>
               </div>
             </div>
 
             {/* Card Footer: Number & Holder */}
-            <div className="relative z-10 flex items-end justify-between border-t border-slate-800/80 pt-3">
+            <div className="relative z-10 flex items-end justify-between border-t border-slate-200 pt-3">
               <div>
-                <div className="font-mono text-xs sm:text-sm tracking-widest text-slate-300 font-bold drop-shadow">
+                <div className="font-mono text-xs sm:text-sm tracking-widest text-slate-700 font-bold">
                   •••• •••• •••• 9842
                 </div>
-                <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5">
+                <div className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mt-0.5">
                   ALEXANDER V. VANCE
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">
+                <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold">
                   VALID THRU
                 </div>
-                <div className="font-mono text-xs font-bold text-slate-200">
+                <div className="font-mono text-xs font-bold text-slate-800">
                   12/30
                 </div>
               </div>
@@ -146,7 +143,7 @@ export default function Card3D({ balance = 128450.00 }) {
 
           {/* ================= BACK OF CARD ================= */}
           <div
-            className="absolute inset-0 w-full h-full rounded-3xl p-6 sm:p-7 backface-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black border border-slate-700/80 shadow-2xl flex flex-col justify-between overflow-hidden"
+            className="absolute inset-0 w-full h-full rounded-3xl p-6 sm:p-7 backface-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black border border-slate-700 shadow-2xl flex flex-col justify-between overflow-hidden"
             style={{ transform: "rotateY(180deg)" }}
           >
             {/* Magnetic Stripe */}
@@ -180,15 +177,18 @@ export default function Card3D({ balance = 128450.00 }) {
 
       {/* Interactive Controls Bar */}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <div className="inline-flex items-center bg-slate-900/90 border border-slate-800 rounded-full p-1 shadow-lg">
+        <div className="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 shadow-sm">
           {currencies.map((c) => (
             <button
               key={c.code}
-              onClick={() => setCurrency(c)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrency(c);
+              }}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
                 currency.code === c.code
-                  ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 scale-105"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-emerald-600 text-white shadow-sm scale-105"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               {c.code} ({c.symbol})
@@ -197,10 +197,13 @@ export default function Card3D({ balance = 128450.00 }) {
         </div>
 
         <button
-          onClick={() => setIsFlipped(!isFlipped)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-all shadow-lg active:scale-95"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsFlipped(!isFlipped);
+          }}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold transition-all shadow-sm active:scale-95"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+          <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
           <span>Flip Card</span>
         </button>
       </div>

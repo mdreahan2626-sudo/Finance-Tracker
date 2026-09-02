@@ -16,22 +16,22 @@ const TICKER_ITEMS = [
 
 export default function MarketTicker() {
   return (
-    <div className="w-full bg-slate-950/90 border-b border-slate-800/80 backdrop-blur-xl overflow-hidden py-2.5 select-none relative z-20">
+    <div className="w-full bg-slate-50/90 border-b border-slate-200/80 backdrop-blur-xl overflow-hidden py-2.5 select-none relative z-20">
       {/* Subtle edge fades */}
-      <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 inset-y-0 w-16 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 inset-y-0 w-16 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
 
       <div className="flex w-max animate-marquee hover:[animation-play-state:paused] space-x-8">
         {[...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS].map((item, idx) => (
           <div
             key={idx}
-            className="inline-flex items-center gap-2 text-xs font-mono tracking-tight text-slate-300 px-3 py-1 rounded-lg bg-slate-900/60 border border-slate-800/50 hover:border-slate-700 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-mono tracking-tight text-slate-700 px-3 py-1 rounded-lg bg-white border border-slate-200/80 shadow-xs hover:border-slate-300 transition-colors"
           >
-            <span className="font-bold text-white">{item.symbol}</span>
-            <span className="text-slate-400">{item.price}</span>
+            <span className="font-bold text-slate-900">{item.symbol}</span>
+            <span className="text-slate-500">{item.price}</span>
             <span
-              className={`flex items-center gap-0.5 font-semibold text-[11px] ${
-                item.up ? "text-emerald-400" : "text-rose-400"
+              className={`flex items-center gap-0.5 font-bold text-[11px] ${
+                item.up ? "text-emerald-600" : "text-rose-600"
               }`}
             >
               {item.up ? (

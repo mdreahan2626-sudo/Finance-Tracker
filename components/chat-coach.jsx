@@ -232,10 +232,10 @@ export default function ChatCoach() {
       {/* Pulsing Floating Button */}
       <Button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-xl hover:shadow-2xl flex items-center justify-center border border-blue-500/30 hover:scale-105 active:scale-95 transition-all duration-300 relative group"
+        className="w-14 h-14 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 text-white shadow-xl hover:shadow-2xl shadow-emerald-500/25 flex items-center justify-center border border-emerald-400/30 hover:scale-105 active:scale-95 transition-all duration-300 relative group"
       >
         <Bot className="h-7 w-7 text-white group-hover:rotate-12 transition-transform duration-300" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-gray-950 animate-pulse"></span>
+        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-white animate-pulse"></span>
       </Button>
     </div>
   );

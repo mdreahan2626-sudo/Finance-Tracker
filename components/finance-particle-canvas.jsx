@@ -24,11 +24,11 @@ export default function FinanceParticleCanvas() {
 
     const symbols = ["$", "€", "£", "¥", "₿", "↗", "▲", "✦", "%"];
     const colors = [
-      "rgba(16, 185, 129, 0.45)", // Emerald
-      "rgba(59, 130, 246, 0.45)",  // Blue
-      "rgba(99, 102, 241, 0.40)",  // Indigo
-      "rgba(245, 158, 11, 0.35)",  // Amber / Gold
-      "rgba(255, 255, 255, 0.25)", // Subtle White
+      "rgba(16, 185, 129, 0.45)",  // Emerald
+      "rgba(13, 148, 136, 0.45)",  // Teal
+      "rgba(37, 99, 235, 0.40)",   // Sapphire Blue
+      "rgba(217, 119, 6, 0.40)",   // Warm Amber / Gold
+      "rgba(100, 116, 139, 0.35)", // Slate
     ];
 
     const particleCount = Math.min(Math.floor((width * height) / 14000), 65);
@@ -66,7 +66,7 @@ export default function FinanceParticleCanvas() {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
-        ctx.font = `${Math.floor(this.size)}px Inter, system-ui, sans-serif`;
+        ctx.font = `600 ${Math.floor(this.size)}px Inter, system-ui, sans-serif`;
         ctx.fillStyle = this.color;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -79,7 +79,7 @@ export default function FinanceParticleCanvas() {
       particles.push(new Particle());
     }
 
-    // Connect close particles with delicate glowing finance web lines
+    // Connect close particles with delicate light theme web lines
     const drawConnections = () => {
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -88,8 +88,8 @@ export default function FinanceParticleCanvas() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 110) {
-            const alpha = (1 - dist / 110) * 0.12;
-            ctx.strokeStyle = `rgba(52, 211, 153, ${alpha})`;
+            const alpha = (1 - dist / 110) * 0.15;
+            ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`;
             ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -112,7 +112,6 @@ export default function FinanceParticleCanvas() {
       ctx.clearRect(0, 0, width, height);
 
       particles.forEach((p) => {
-        // Subtle mouse repulsion for interactive feel
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
