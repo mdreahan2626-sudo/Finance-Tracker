@@ -66,51 +66,51 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
   }, [error]);
 
   // Determine indicator style and alert messages
-  let progressColor = "bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+  let progressColor = "bg-gradient-to-r from-emerald-500 to-teal-500 shadow-sm";
   let alertBanner = null;
 
   if (percentUsed >= 100) {
-    progressColor = "bg-gradient-to-r from-rose-500 to-red-600 shadow-[0_0_10px_rgba(239,68,68,0.4)]";
+    progressColor = "bg-gradient-to-r from-rose-500 to-red-600 shadow-sm";
     alertBanner = (
-      <div className="flex items-center gap-2 text-xs font-medium text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-500/15 p-3 rounded-lg border border-red-500/20">
-        <AlertTriangle className="h-4 w-4 shrink-0" />
+      <div className="flex items-center gap-2 text-xs font-semibold text-red-700 bg-red-50 p-3 rounded-xl border border-red-200">
+        <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
         <span>You have exceeded your monthly budget by ${Math.abs(remaining).toFixed(2)}!</span>
       </div>
     );
   } else if (percentUsed >= 90) {
-    progressColor = "bg-gradient-to-r from-rose-400 to-red-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]";
+    progressColor = "bg-gradient-to-r from-rose-400 to-red-500 shadow-sm";
     alertBanner = (
-      <div className="flex items-center gap-2 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-500/10 dark:bg-rose-500/15 p-3 rounded-lg border border-rose-500/20">
-        <AlertTriangle className="h-4 w-4 shrink-0" />
+      <div className="flex items-center gap-2 text-xs font-semibold text-rose-700 bg-rose-50 p-3 rounded-xl border border-rose-200">
+        <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
         <span>Critical Warning: You've used {percentUsed.toFixed(0)}% of your monthly budget.</span>
       </div>
     );
   } else if (percentUsed >= 75) {
-    progressColor = "bg-gradient-to-r from-amber-400 to-orange-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]";
+    progressColor = "bg-gradient-to-r from-amber-400 to-orange-500 shadow-sm";
     alertBanner = (
-      <div className="flex items-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-500/15 p-3 rounded-lg border border-amber-500/20">
-        <AlertTriangle className="h-4 w-4 shrink-0" />
+      <div className="flex items-center gap-2 text-xs font-semibold text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200">
+        <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
         <span>Warning: You have used {percentUsed.toFixed(0)}% of your budget. Slow down spending.</span>
       </div>
     );
   } else if (initialBudget) {
     alertBanner = (
-      <div className="flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/15 p-3 rounded-lg border border-emerald-500/20">
-        <Sparkles className="h-4 w-4 shrink-0" />
+      <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+        <Sparkles className="h-4 w-4 shrink-0 text-emerald-600" />
         <span>Budget is in a healthy state. You are on track this month!</span>
       </div>
     );
   }
 
   return (
-    <Card className="relative overflow-hidden border border-border/80 bg-gradient-to-br from-indigo-500/[0.02] via-transparent to-transparent shadow-sm">
+    <Card className="relative overflow-hidden border border-slate-200 bg-white/95 backdrop-blur-xl shadow-xs rounded-2xl text-slate-900">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex-1">
-          <CardTitle className="text-base font-bold tracking-tight">
-            Monthly Budget Optimizer
+          <CardTitle className="text-base font-black text-slate-950 tracking-tight flex items-center gap-2">
+            <PiggyBank className="w-5 h-5 text-emerald-600" /> Monthly Budget Optimizer
           </CardTitle>
-          <CardDescription className="text-xs mt-1">
-            Track, adjust, and limit your monthly expenses for the default account.
+          <CardDescription className="text-xs text-slate-500 mt-1">
+            Track, adjust, and limit your monthly expenses for your default account.
           </CardDescription>
         </div>
 
@@ -121,7 +121,7 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
                 type="number"
                 value={newBudget}
                 onChange={(e) => setNewBudget(e.target.value)}
-                className="w-28 h-8 text-sm"
+                className="w-28 h-8 text-sm border-slate-300"
                 placeholder="Amount"
                 autoFocus
                 disabled={isLoading}
@@ -129,7 +129,7 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 text-green-600 border-green-500/20 bg-green-500/5 hover:bg-green-500/10"
+                className="h-8 w-8 text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
                 onClick={handleUpdateBudget}
                 disabled={isLoading}
               >
@@ -138,7 +138,7 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 text-red-600 border-red-500/20 bg-red-500/5 hover:bg-red-500/10"
+                className="h-8 w-8 text-rose-700 border-rose-300 bg-rose-50 hover:bg-rose-100"
                 onClick={handleCancel}
                 disabled={isLoading}
               >
@@ -150,67 +150,48 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
               variant="outline"
               size="sm"
               onClick={() => setIsEditing(true)}
-              className="h-8 text-xs font-semibold gap-1"
+              className="h-8 text-xs font-bold gap-1.5 border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-xs"
             >
-              <Pencil className="h-3 w-3" />
+              <Pencil className="h-3 w-3 text-emerald-600" />
               {initialBudget ? "Edit Budget" : "Set Budget"}
             </Button>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {!initialBudget ? (
-          <div className="text-center py-6 border border-dashed rounded-xl bg-muted/20">
-            <PiggyBank className="h-10 w-10 text-muted-foreground/60 mx-auto mb-2" />
-            <p className="text-sm font-semibold">No Monthly Budget Set</p>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 px-4">
-              Set up a monthly spending limit to manage your wealth responsibly and receive real-time updates.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* 3-Column Summary Stats */}
-            <div className="grid grid-cols-3 gap-2 text-center bg-muted/30 dark:bg-muted/10 p-3 rounded-xl border">
-              <div>
-                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Total Limit</p>
-                <p className="text-base font-bold mt-0.5 text-foreground">
-                  ${initialBudget.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div className="border-x">
-                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Spent</p>
-                <p className="text-base font-bold mt-0.5 text-rose-500">
-                  ${currentExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
-                  {remaining >= 0 ? "Remaining" : "Over Budget"}
-                </p>
-                <p className={`text-base font-bold mt-0.5 ${remaining >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                  ${Math.abs(remaining).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
+      <CardContent className="space-y-4">
+        {initialBudget ? (
+          <div className="space-y-3">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-slate-600">
+                Spent: <span className="font-bold text-slate-950">${currentExpenses.toFixed(2)}</span>
+              </span>
+              <span className="text-slate-600">
+                Cap: <span className="font-bold text-slate-950">${initialBudget.amount.toFixed(2)}</span>
+              </span>
             </div>
 
-            {/* Custom Progress Bar Section */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground font-medium">Spending Progress</span>
-                <span className="font-semibold text-foreground">
-                  {percentUsed.toFixed(1)}% used
-                </span>
-              </div>
-              <Progress
-                value={percentUsed > 100 ? 100 : percentUsed}
-                className="h-3 bg-muted/60 dark:bg-muted/20"
-                extraStyles={progressColor}
+            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+                style={{ width: `${Math.min(percentUsed, 100)}%` }}
               />
             </div>
 
-            {/* Warning / Health Status Banner */}
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-bold text-slate-500">
+                {percentUsed.toFixed(1)}% consumed
+              </span>
+              <span className={`font-bold ${remaining >= 0 ? "text-emerald-700" : "text-rose-600"}`}>
+                {remaining >= 0 ? `$${remaining.toFixed(2)} remaining` : `-$${Math.abs(remaining).toFixed(2)} over limit`}
+              </span>
+            </div>
+
             {alertBanner}
+          </div>
+        ) : (
+          <div className="p-6 text-center border border-dashed border-slate-300 rounded-2xl bg-slate-50/60 text-slate-500 text-xs">
+            No budget set yet for your default account. Click "Set Budget" above to start tracking.
           </div>
         )}
       </CardContent>
