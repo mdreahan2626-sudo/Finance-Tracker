@@ -17,16 +17,23 @@ export default async function DashboardPage() {
   let user = null;
 
   try {
-    const results = await Promise.all([
+    user = await checkUser();
+    if (!user) {
+      redirect("/sign-in");
+    }
+
+    const [accountsRes, transactionsRes] = await Promise.all([
       getUserAccounts(),
       getDashboardData(),
-      checkUser(),
     ]);
-    accounts = results[0] || [];
-    transactions = results[1] || [];
-    user = results[2];
+    accounts = accountsRes || [];
+    transactions = transactionsRes || [];
   } catch (error) {
-    redirect("/sign-in");
+    console.error("Dashboard error:", error);
+    // Only redirect to sign-in if completely unauthenticated
+    if (!user) {
+      redirect("/sign-in");
+    }
   }
 
   const defaultAccount = accounts?.find((account) => account.isDefault);

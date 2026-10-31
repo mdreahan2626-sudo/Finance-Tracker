@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -20,6 +21,7 @@ import GyroscopicWealthOrb from "@/components/gyroscopic-wealth-orb";
 import FinanceParticleCanvas from "@/components/finance-particle-canvas";
 
 export default function HeroSection() {
+  const { data: session } = useSession();
   const [activeView, setActiveView] = useState("orb"); // "orb" or "card"
 
   return (
@@ -65,11 +67,19 @@ export default function HeroSection() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-              <AuthModal defaultTab="register">
-                <Button size="lg" className="h-13 sm:h-14 px-8 sm:px-10 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black shadow-xl shadow-emerald-600/20 transition-all duration-300 flex items-center gap-2 text-base sm:text-lg active:scale-95">
-                  Get Started Free <ArrowRight className="w-5 h-5" />
-                </Button>
-              </AuthModal>
+              {session ? (
+                <Link href="/dashboard">
+                  <Button size="lg" className="h-13 sm:h-14 px-8 sm:px-10 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black shadow-xl shadow-emerald-600/20 transition-all duration-300 flex items-center gap-2 text-base sm:text-lg active:scale-95 cursor-pointer">
+                    Go to Dashboard <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </Link>
+              ) : (
+                <AuthModal defaultTab="register">
+                  <Button size="lg" className="h-13 sm:h-14 px-8 sm:px-10 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black shadow-xl shadow-emerald-600/20 transition-all duration-300 flex items-center gap-2 text-base sm:text-lg active:scale-95 cursor-pointer">
+                    Get Started Free <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </AuthModal>
+              )}
               <Link href="#simulator">
                 <Button size="lg" variant="outline" className="h-13 sm:h-14 px-8 rounded-2xl border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-base sm:text-lg shadow-sm">
                   3D Wealth Simulator

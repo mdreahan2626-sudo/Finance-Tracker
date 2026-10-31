@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { signIn } from "next-auth/react";
+import React, { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,14 +11,36 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 export default function SignInPage() {
+  const { data: session, status } = useSession();
   const [tab, setTab] = useState("login");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  // If already logged in, redirect immediately to dashboard
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
+
+  // Form inputs
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+          <p className="text-sm font-semibold text-slate-600">
+            {status === "authenticated" ? "Already signed in! Loading your dashboard..." : "Checking session..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();

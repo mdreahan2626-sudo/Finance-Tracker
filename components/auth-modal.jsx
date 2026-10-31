@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { 
   Dialog, 
@@ -18,11 +18,20 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 export default function AuthModal({ children, defaultTab = "login" }) {
+  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState(defaultTab);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
+  const handleOpenChange = (newOpen) => {
+    if (newOpen && session) {
+      router.push("/dashboard");
+      return;
+    }
+    setOpen(newOpen);
+  };
 
   // Form inputs
   const [name, setName] = useState("");
@@ -66,7 +75,7 @@ export default function AuthModal({ children, defaultTab = "login" }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
