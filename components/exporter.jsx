@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, FileSpreadsheet, Sparkles, Loader2, FileText } from "lucide-react";
+import { Download, FileSpreadsheet, Sparkles, Loader2, FileText, Mail } from "lucide-react";
 import { getRagStatementData } from "@/actions/rag-exporter";
+import { sendMonthlyStatementEmail } from "@/actions/send-monthly-statement";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -11,6 +12,33 @@ import autoTable from "jspdf-autotable";
 export default function Exporter() {
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingCsv, setIsExportingCsv] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  // Send Email with Monthly Report & Transactions
+  const handleSendEmail = async () => {
+    try {
+      setIsSendingEmail(true);
+      toast.info("Generating report and delivering to your email...");
+      const res = await sendMonthlyStatementEmail();
+      if (res.success) {
+        if (res.notice) {
+          toast.success(`Statement delivered to ${res.recipient}!`, {
+            description: res.notice,
+            duration: 7000,
+          });
+        } else {
+          toast.success(`Report & transactions delivered to ${res.recipient}!`);
+        }
+      } else {
+        toast.error(res.error || "Failed to send email");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error delivering email report.");
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   // One-Click CSV Exporter
   const handleExportCsv = async () => {
@@ -153,6 +181,21 @@ export default function Exporter() {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
+      {/* Email Report & Transactions Button */}
+      <Button
+        onClick={handleSendEmail}
+        disabled={isSendingEmail}
+        variant="outline"
+        className="h-10 px-4 rounded-xl border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
+      >
+        {isSendingEmail ? (
+          <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
+        ) : (
+          <Mail className="w-4 h-4 text-emerald-600" />
+        )}
+        <span>Email Report & Ledger</span>
+      </Button>
+
       {/* Export CSV Button */}
       <Button
         onClick={handleExportCsv}

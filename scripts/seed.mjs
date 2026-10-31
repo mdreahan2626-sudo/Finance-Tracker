@@ -5,7 +5,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const db = new PrismaClient();
+const db = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DIRECT_URL || process.env.DATABASE_URL,
+    },
+  },
+});
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const ACCOUNT_ID = "0a2aaae8-7555-4612-8f62-36a367185ee3";
@@ -85,102 +91,108 @@ async function seedTransactions() {
       }
     }
 
-    await db.$transaction(async (tx) => {
-      // Ensure user exists
-      await tx.user.upsert({
-        where: { id: USER_ID },
-        update: {},
-        create: {
-          id: USER_ID,
-          clerkUserId: "seed_clerk_user",
-          email: RECIPIENT_EMAIL,
-          name: "Seed User",
-        },
-      });
+    // Ensure user exists
+    await db.user.upsert({
+      where: { id: USER_ID },
+      update: {},
+      create: {
+        id: USER_ID,
+        clerkUserId: "seed_clerk_user",
+        email: RECIPIENT_EMAIL,
+        name: "Seed User",
+      },
+    });
 
-      // Ensure account exists
-      await tx.account.upsert({
-        where: { id: ACCOUNT_ID },
-        update: {},
-        create: {
-          id: ACCOUNT_ID,
-          name: "Main Savings",
-          type: "SAVINGS",
-          balance: 0,
-          userId: USER_ID,
-          isDefault: true,
-        },
-      });
+    // Ensure account exists
+    await db.account.upsert({
+      where: { id: ACCOUNT_ID },
+      update: {},
+      create: {
+        id: ACCOUNT_ID,
+        name: "Main Savings",
+        type: "SAVINGS",
+        balance: 0,
+        userId: USER_ID,
+        isDefault: true,
+      },
+    });
 
-      await tx.transaction.deleteMany({
-        where: { accountId: ACCOUNT_ID },
-      });
-      await tx.transaction.createMany({
-        data: transactions,
-      });
-      await tx.account.update({
-        where: { id: ACCOUNT_ID },
-        data: { balance: totalBalance },
-      });
+    await db.transaction.deleteMany({
+      where: { accountId: ACCOUNT_ID },
+    });
+    await db.transaction.createMany({
+      data: transactions,
+    });
+    await db.account.update({
+      where: { id: ACCOUNT_ID },
+      data: { balance: totalBalance },
     });
 
     console.log(`✅ Created ${transactions.length} dummy transactions in database!`);
 
-    // 1. Send Test Transaction Email Notification
-    console.log(`📧 Sending Transaction Alert Email to ${RECIPIENT_EMAIL}...`);
-    const sampleTx = transactions[0];
-    const txEmailResult = await resend.emails.send({
-      from: "Welth App <onboarding@resend.dev>",
-      to: RECIPIENT_EMAIL,
-      subject: `Welth Alert: ${sampleTx.type === "INCOME" ? "+" : "-"}$${sampleTx.amount} (${sampleTx.category})`,
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px;">
-          <h2 style="color: #2563eb;">Welth Transaction Alert 💳</h2>
-          <p>A new transaction has been logged on your account:</p>
-          <ul>
-            <li><strong>Type:</strong> ${sampleTx.type}</li>
-            <li><strong>Amount:</strong> $${sampleTx.amount}</li>
-            <li><strong>Category:</strong> ${sampleTx.category}</li>
-            <li><strong>Description:</strong> ${sampleTx.description}</li>
-            <li><strong>Date:</strong> ${sampleTx.date.toLocaleDateString()}</li>
-          </ul>
-          <p style="color: #64748b; font-size: 12px;">Automated notification sent via Welth Finance System.</p>
-        </div>
-      `,
-    });
-    console.log("✅ Transaction Email Sent! Resend ID:", txEmailResult.data?.id || txEmailResult);
-
-    // 2. Send Test Monthly Expense Summary Report Email
-    console.log(`📧 Sending Monthly Expense Summary Report Email to ${RECIPIENT_EMAIL}...`);
-    const summaryEmailResult = await resend.emails.send({
-      from: "Welth App <onboarding@resend.dev>",
-      to: RECIPIENT_EMAIL,
-      subject: `Your Monthly Financial & Expense Summary Report 📊`,
-      html: `
-        <div style="font-family: sans-serif; padding: 24px; border: 1px solid #cbd5e1; border-radius: 12px;">
-          <h1 style="color: #0f172a; margin-bottom: 4px;">Monthly Financial Report 📊</h1>
-          <p style="color: #64748b; font-size: 14px;">Summary for July 2026</p>
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
-          <div style="display: flex; gap: 16px;">
-            <div style="padding: 12px; background: #f0fdf4; border-radius: 8px;">
-              <div style="font-size: 12px; color: #166534;">Total Income</div>
-              <div style="font-size: 20px; font-weight: bold; color: #15803d;">+$${totalIncome.toFixed(2)}</div>
-            </div>
-            <div style="padding: 12px; background: #fff1f2; border-radius: 8px;">
-              <div style="font-size: 12px; color: #9f1239;">Total Expenses</div>
-              <div style="font-size: 20px; font-weight: bold; color: #be123c;">-$${totalExpenses.toFixed(2)}</div>
-            </div>
+    try {
+      // 1. Send Test Transaction Email Notification
+      console.log(`📧 Sending Transaction Alert Email to ${RECIPIENT_EMAIL}...`);
+      const sampleTx = transactions[0];
+      const txEmailResult = await resend.emails.send({
+        from: "Welth App <onboarding@resend.dev>",
+        to: RECIPIENT_EMAIL,
+        subject: `Welth Alert: ${sampleTx.type === "INCOME" ? "+" : "-"}$${sampleTx.amount} (${sampleTx.category})`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px;">
+            <h2 style="color: #2563eb;">Welth Transaction Alert 💳</h2>
+            <p>A new transaction has been logged on your account:</p>
+            <ul>
+              <li><strong>Type:</strong> ${sampleTx.type}</li>
+              <li><strong>Amount:</strong> $${sampleTx.amount}</li>
+              <li><strong>Category:</strong> ${sampleTx.category}</li>
+              <li><strong>Description:</strong> ${sampleTx.description}</li>
+              <li><strong>Date:</strong> ${sampleTx.date.toLocaleDateString()}</li>
+            </ul>
+            <p style="color: #64748b; font-size: 12px;">Automated notification sent via Welth Finance System.</p>
           </div>
-          <p style="margin-top: 16px;"><strong>Net Balance:</strong> $${totalBalance.toFixed(2)}</p>
-          <h3 style="color: #1e293b;">Welth AI Insights:</h3>
-          <ul>
-            <li>Housing, transportation, and groceries accounted for the majority of expenses this cycle.</li>
-            <li>All transactions are synced to your live cockpits and Prisma database.</li>
-          </ul>
-        </div>
-      `,
-    });
-    console.log("✅ Summary Report Email Sent! Resend ID:", summaryEmailResult.data?.id || summaryEmailResult);
+        `,
+      });
+      console.log("✅ Transaction Email Sent! Resend ID:", txEmailResult.data?.id || txEmailResult);
+    } catch (emailErr) {
+      console.warn("⚠️ Transaction email skipped / failed:", emailErr.message);
+    }
+
+    try {
+      // 2. Send Test Monthly Expense Summary Report Email
+      console.log(`📧 Sending Monthly Expense Summary Report Email to ${RECIPIENT_EMAIL}...`);
+      const summaryEmailResult = await resend.emails.send({
+        from: "Welth App <onboarding@resend.dev>",
+        to: RECIPIENT_EMAIL,
+        subject: `Your Monthly Financial & Expense Summary Report 📊`,
+        html: `
+          <div style="font-family: sans-serif; padding: 24px; border: 1px solid #cbd5e1; border-radius: 12px;">
+            <h1 style="color: #0f172a; margin-bottom: 4px;">Monthly Financial Report 📊</h1>
+            <p style="color: #64748b; font-size: 14px;">Summary for July 2026</p>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
+            <div style="display: flex; gap: 16px;">
+              <div style="padding: 12px; background: #f0fdf4; border-radius: 8px;">
+                <div style="font-size: 12px; color: #166534;">Total Income</div>
+                <div style="font-size: 20px; font-weight: bold; color: #15803d;">+$${totalIncome.toFixed(2)}</div>
+              </div>
+              <div style="padding: 12px; background: #fff1f2; border-radius: 8px;">
+                <div style="font-size: 12px; color: #9f1239;">Total Expenses</div>
+                <div style="font-size: 20px; font-weight: bold; color: #be123c;">-$${totalExpenses.toFixed(2)}</div>
+              </div>
+            </div>
+            <p style="margin-top: 16px;"><strong>Net Balance:</strong> $${totalBalance.toFixed(2)}</p>
+            <h3 style="color: #1e293b;">Welth AI Insights:</h3>
+            <ul>
+              <li>Housing, transportation, and groceries accounted for the majority of expenses this cycle.</li>
+              <li>All transactions are synced to your live cockpits and Prisma database.</li>
+            </ul>
+          </div>
+        `,
+      });
+      console.log("✅ Summary Report Email Sent! Resend ID:", summaryEmailResult.data?.id || summaryEmailResult);
+    } catch (emailErr) {
+      console.warn("⚠️ Summary report email skipped / failed:", emailErr.message);
+    }
 
   } catch (error) {
     console.error("❌ Error seeding:", error);

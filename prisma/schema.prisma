@@ -15,6 +15,7 @@ model User {
   name          String?
   imageUrl      String?
   image         String?
+  password      String?
   emailVerified DateTime?
   authAccounts  AuthAccount[]
   sessions      Session[]

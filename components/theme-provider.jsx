@@ -3,17 +3,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext({
-  theme: "dark",
+  theme: "light",
   setTheme: () => null,
 });
 
 export function ThemeProvider({ children }) {
-  const [theme] = useState("dark");
+  const [theme] = useState("light");
 
   useEffect(() => {
-    // Force dark mode on document element permanently
-    document.documentElement.classList.add("dark");
-    localStorage.setItem("theme", "dark");
+    // Keep clean light theme
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
   }, []);
 
   return (

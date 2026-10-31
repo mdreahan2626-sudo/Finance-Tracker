@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,21 +50,54 @@ function DialogTrigger({ children, asChild, ...props }) {
 
 function DialogContent({ className, children, ...props }) {
   const { open, setOpen } = React.useContext(DialogContext);
+  const [mounted, setMounted] = React.useState(false);
 
-  if (!open) return null;
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in-0 duration-200">
+  // Close on Escape key
+  React.useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, setOpen]);
+
+  // Lock body scroll when modal is open
+  React.useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  if (!open || !mounted) return null;
+
+  const modalElement = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in-0 duration-200 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) setOpen(false);
+      }}
+    >
       <div
         className={cn(
-          "relative w-full max-w-lg rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-2xl animate-in zoom-in-95 duration-200",
+          "relative w-full max-w-[440px] rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-2xl text-slate-900 my-auto animate-in zoom-in-95 duration-200",
           className
         )}
         {...props}
       >
         <button
+          type="button"
           onClick={() => setOpen(false)}
-          className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
           <span className="sr-only">Close</span>
@@ -72,6 +106,8 @@ function DialogContent({ className, children, ...props }) {
       </div>
     </div>
   );
+
+  return createPortal(modalElement, document.body);
 }
 
 function DialogHeader({ className, ...props }) {
@@ -79,11 +115,11 @@ function DialogHeader({ className, ...props }) {
 }
 
 function DialogTitle({ className, ...props }) {
-  return <h2 className={cn("text-lg font-bold tracking-tight text-white", className)} {...props} />;
+  return <h2 className={cn("text-xl font-black tracking-tight text-slate-950", className)} {...props} />;
 }
 
 function DialogDescription({ className, ...props }) {
-  return <p className={cn("text-sm text-slate-400", className)} {...props} />;
+  return <p className={cn("text-xs text-slate-500", className)} {...props} />;
 }
 
 export {

@@ -141,13 +141,13 @@ export function DashboardOverview({ accounts, transactions }) {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Recent Transactions Card */}
-      <Card className="border border-border/80 bg-gradient-to-br from-indigo-500/[0.01] to-transparent shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
+      <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="space-y-1">
-            <CardTitle className="text-base font-bold tracking-tight">
+            <CardTitle className="text-base font-black tracking-tight text-slate-950 dark:text-white">
               Recent Transactions
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs text-slate-600 dark:text-slate-300 font-medium">
               Review your latest account activity and transfers.
             </CardDescription>
           </div>
@@ -155,12 +155,12 @@ export function DashboardOverview({ accounts, transactions }) {
             value={selectedAccountId}
             onValueChange={setSelectedAccountId}
           >
-            <SelectTrigger className="w-[150px] h-8 text-xs font-semibold">
+            <SelectTrigger className="w-[150px] h-8 text-xs font-semibold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
               <SelectValue placeholder="Select account" />
             </SelectTrigger>
             <SelectContent>
               {accounts.map((account) => (
-                <SelectItem key={account.id} value={account.id} className="text-xs">
+                <SelectItem key={account.id} value={account.id} className="text-xs font-semibold text-slate-900 dark:text-white">
                   {account.name}
                 </SelectItem>
               ))}
@@ -170,10 +170,10 @@ export function DashboardOverview({ accounts, transactions }) {
         <CardContent className="pt-4">
           <div className="space-y-3.5">
             {recentTransactions.length === 0 ? (
-              <div className="text-center py-10 border border-dashed rounded-xl bg-muted/10">
-                <Calendar className="h-8 w-8 text-muted-foreground/60 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-muted-foreground">No recent transactions</p>
-                <p className="text-[10px] text-muted-foreground/80 mt-0.5">Transactions you add will show up here</p>
+              <div className="text-center py-10 border border-dashed rounded-xl bg-slate-50 dark:bg-slate-800/40">
+                <Calendar className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">No recent transactions</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Transactions you add will show up here</p>
               </div>
             ) : (
               recentTransactions.map((transaction) => {
@@ -184,7 +184,7 @@ export function DashboardOverview({ accounts, transactions }) {
                 return (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between p-2 rounded-xl hover:bg-muted/40 transition-all duration-200"
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all duration-200 border border-transparent hover:border-slate-100 dark:hover:border-slate-800"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {/* Icon Container */}
@@ -194,20 +194,20 @@ export function DashboardOverview({ accounts, transactions }) {
                       
                       {/* Description & Category Badge */}
                       <div className="space-y-0.5 min-w-0">
-                        <p className="text-xs font-semibold leading-tight text-foreground truncate">
+                        <p className="text-sm font-bold leading-tight text-slate-950 dark:text-slate-50 truncate">
                           {transaction.description || "Untitled Transaction"}
                         </p>
-                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
                           <span>{format(new Date(transaction.date), "PP")}</span>
-                          <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground/50"></span>
-                          <span className="capitalize">{transaction.category}</span>
+                          <span className="inline-block w-1 h-1 rounded-full bg-slate-400"></span>
+                          <span className="capitalize font-semibold text-slate-600 dark:text-slate-300">{transaction.category}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Amount */}
-                    <div className="flex items-center gap-1 shrink-0 font-bold text-sm">
-                      <span className={cn(isExpense ? "text-rose-500 dark:text-rose-400" : "text-emerald-500 dark:text-emerald-400")}>
+                    <div className="flex items-center gap-1 shrink-0 font-extrabold text-sm">
+                      <span className={cn(isExpense ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400")}>
                         {isExpense ? "-" : "+"}${transaction.amount.toFixed(2)}
                       </span>
                     </div>
@@ -220,21 +220,21 @@ export function DashboardOverview({ accounts, transactions }) {
       </Card>
 
       {/* Expense Breakdown Card */}
-      <Card className="border border-border/80 bg-gradient-to-br from-indigo-500/[0.01] to-transparent shadow-sm">
-        <CardHeader className="border-b pb-4">
-          <CardTitle className="text-base font-bold tracking-tight">
+      <Card className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
+        <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-4">
+          <CardTitle className="text-base font-black tracking-tight text-slate-950 dark:text-white">
             Monthly Expense Breakdown
           </CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-slate-600 dark:text-slate-300 font-medium">
             Review how your funds are distributed by category this month.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           {pieChartData.length === 0 ? (
-            <div className="text-center py-12 border border-dashed rounded-xl bg-muted/10">
-              <TrendingUp className="h-8 w-8 text-muted-foreground/60 mx-auto mb-2" />
-              <p className="text-xs font-semibold text-muted-foreground">No expenses this month</p>
-              <p className="text-[10px] text-muted-foreground/80 mt-0.5">Add expenses to generate charts</p>
+            <div className="text-center py-12 border border-dashed rounded-xl bg-slate-50 dark:bg-slate-800/40">
+              <TrendingUp className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-200">No expenses this month</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Add expenses to generate charts</p>
             </div>
           ) : (
             <div className="relative h-[250px]">
@@ -253,7 +253,7 @@ export function DashboardOverview({ accounts, transactions }) {
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
-                        stroke="hsl(var(--card))"
+                        stroke="#ffffff"
                         strokeWidth={2}
                       />
                     ))}
@@ -264,17 +264,17 @@ export function DashboardOverview({ accounts, transactions }) {
                     height={36} 
                     iconType="circle" 
                     iconSize={8}
-                    wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                    wrapperStyle={{ fontSize: "11px", fontWeight: "600", paddingTop: "10px" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
               
               {/* Absolute Center Content inside Donut Hole */}
               <div className="absolute top-[44%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-widest">
+                <span className="text-[10px] uppercase font-black text-slate-600 dark:text-slate-300 tracking-wider">
                   Spent
                 </span>
-                <span className="text-lg font-extrabold text-foreground mt-0.5">
+                <span className="text-xl font-black text-slate-950 dark:text-white mt-0.5">
                   ${totalMonthExpenses.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                 </span>
               </div>
