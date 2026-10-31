@@ -9,6 +9,7 @@ function hashPassword(password) {
 }
 
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET || "welth_finance_tracker_secret_key_2026",
   trustHost: true,
   providers: [
     GoogleProvider({

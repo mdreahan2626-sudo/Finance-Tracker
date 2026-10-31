@@ -12,16 +12,15 @@ import Exporter from "@/components/exporter";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
+  const user = await checkUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   let accounts = [];
   let transactions = [];
-  let user = null;
 
   try {
-    user = await checkUser();
-    if (!user) {
-      redirect("/sign-in");
-    }
-
     const [accountsRes, transactionsRes] = await Promise.all([
       getUserAccounts(),
       getDashboardData(),
@@ -29,11 +28,7 @@ export default async function DashboardPage() {
     accounts = accountsRes || [];
     transactions = transactionsRes || [];
   } catch (error) {
-    console.error("Dashboard error:", error);
-    // Only redirect to sign-in if completely unauthenticated
-    if (!user) {
-      redirect("/sign-in");
-    }
+    console.error("Dashboard data load error:", error);
   }
 
   const defaultAccount = accounts?.find((account) => account.isDefault);
