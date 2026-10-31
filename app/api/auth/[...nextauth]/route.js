@@ -115,12 +115,22 @@ export const authOptions = {
           });
 
           if (!existingUser) {
-            await db.user.create({
+            const newUser = await db.user.create({
               data: {
                 email: user.email,
                 name: user.name || "User",
                 imageUrl: user.image || "",
                 image: user.image || "",
+              },
+            });
+
+            await db.account.create({
+              data: {
+                name: "Main Savings",
+                type: "SAVINGS",
+                balance: 0,
+                isDefault: true,
+                userId: newUser.id,
               },
             });
           } else {
